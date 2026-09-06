@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse, QAResult } from '@listingko/shared-types';
-import { Database } from '@/lib/database';
+import { Database, supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all QA results for listings belonging to this product
-    const results = await Database.supabase
+    const results = await supabase
       .from('qa_results')
       .select(`
         *,

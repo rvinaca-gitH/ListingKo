@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse } from '@listingko/shared-types';
-import { Database } from '@/lib/database';
+import { Database, supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     // Get marketplace connection
-    const connection = await Database.supabase
+    const connection = await supabase
       .from('marketplace_connections')
       .select('*')
       .eq('id', body.marketplaceConnectionId)
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const platformListingId = `${listing.platform}-${Date.now()}`;
 
     // Update listing with published info
-    const result = await Database.supabase
+    const result = await supabase
       .from('listings')
       .update({
         status: 'PUBLISHED',

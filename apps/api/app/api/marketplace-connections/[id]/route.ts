@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse } from '@listingko/shared-types';
-import { Database } from '@/lib/database';
+import { supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       );
     }
 
-    const connection = await Database.supabase
+    const connection = await supabase
       .from('marketplace_connections')
       .select('*')
       .eq('id', params.id)
@@ -92,7 +92,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       );
     }
 
-    const result = await Database.supabase
+    const result = await supabase
       .from('marketplace_connections')
       .delete()
       .eq('id', params.id)
@@ -150,7 +150,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       shop_name?: string;
     };
 
-    const result = await Database.supabase
+    const result = await supabase
       .from('marketplace_connections')
       .update({
         status: body.status,

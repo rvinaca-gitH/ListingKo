@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse } from '@listingko/shared-types';
-import { Database } from '@/lib/database';
+import { supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const connections = await Database.supabase
+    const connections = await supabase
       .from('marketplace_connections')
       .select('id, marketplace, status, shop_id, shop_name, created_at, updated_at')
       .eq('user_id', userId)
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if connection already exists
-    const existing = await Database.supabase
+    const existing = await supabase
       .from('marketplace_connections')
       .select('id')
       .eq('user_id', userId)
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     const credentialsEncrypted = JSON.stringify(body.credentials || {});
     const credentialsIv = 'placeholder-iv'; // TODO: Generate proper IV
 
-    const result = await Database.supabase
+    const result = await supabase
       .from('marketplace_connections')
       .insert({
         user_id: userId,
