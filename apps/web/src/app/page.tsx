@@ -25,6 +25,7 @@ export default function Home() {
       setUser(session?.user || null);
     } catch (error) {
       console.error('Auth check failed:', error);
+      // In dev mode with no Supabase, start with no user (user will use mock sign-in)
       setUser(null);
     } finally {
       setLoading(false);
@@ -39,7 +40,22 @@ export default function Home() {
       setUser(data.user);
     } catch (error) {
       console.error('Sign in failed:', error);
-      alert('Failed to sign in. Try again.');
+      // Dev mode fallback: create mock user when Supabase is unavailable
+      if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        console.warn('[DEV MODE] Using mock user - Supabase unavailable');
+        const mockUser = {
+          id: 'dev-user-' + Math.random().toString(36).substr(2, 9),
+          email: 'dev@listingko.local',
+          user_metadata: {},
+          app_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setUser(mockUser as any);
+      } else {
+        alert('Failed to sign in. Try again.');
+      }
     } finally {
       setSigningIn(false);
     }
@@ -68,6 +84,11 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col p-8">
       <div className="max-w-4xl mx-auto w-full">
+        {/* DEBUG BANNER */}
+        <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">
+          DEBUG: user={user ? `"${user.id}"` : 'null'} | loading={loading} | signingIn={signingIn}
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">ListingKo</h1>

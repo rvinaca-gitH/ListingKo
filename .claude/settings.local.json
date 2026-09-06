@@ -45,7 +45,13 @@
       "Bash(pkill -9 next)",
       "Bash(pkill -9 pnpm)",
       "Bash(pkill -15 -f \"next\\\\|pnpm\\\\|node.*dev\\\\|node.*start\")",
-      "Bash(pkill -9 -f \"node\")"
+      "Bash(pkill -9 -f \"node\")",
+      "Bash(pkill -f \"next start\")",
+      "Bash(pkill -9 -f \"node.*3001\")",
+      "Bash(awk '{print $2}')",
+      "Bash(xargs kill -9)",
+      "Bash(pkill -9 -f \"next start\")",
+      "Bash(pkill -9 -f \"node\\\\|next\")"
     ]
   }
 }

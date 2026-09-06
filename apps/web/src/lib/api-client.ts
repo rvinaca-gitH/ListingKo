@@ -7,6 +7,11 @@ export class ApiClient {
   static async getAuthToken(): Promise<string | null> {
     const { data, error } = await supabase.auth.getSession();
     if (error || !data.session) {
+      // Dev mode: generate mock token when Supabase is unavailable
+      if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        console.warn('[DEV MODE] Using mock auth token');
+        return 'dev-mock-token-' + Date.now();
+      }
       return null;
     }
     return data.session.access_token;

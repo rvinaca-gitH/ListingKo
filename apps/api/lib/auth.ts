@@ -15,13 +15,24 @@ export async function getAuthUser(request: NextRequest): Promise<string | undefi
       return undefined;
     }
 
+    // Dev mode: accept mock tokens (check FIRST before JWT verification)
+    if (process.env.NODE_ENV === 'development' && token.startsWith('dev-mock-token-')) {
+      console.warn('[DEV MODE] Accepting mock auth token:', token);
+      return 'dev-user-mock';
+    }
+
     // Verify JWT token
     const secret = new TextEncoder().encode(JWT_SECRET);
     const verified = await jwtVerify(token, secret);
 
     return verified.payload.sub as string;
   } catch (error) {
-    console.error('Auth verification error:', error);
+    // In dev mode, log but don't fail - we might be using mock tokens
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[DEV MODE] Auth error (dev mode allows requests to continue):', error);
+    } else {
+      console.error('Auth verification error:', error);
+    }
     return undefined;
   }
 }
