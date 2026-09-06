@@ -1,10 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { ApiResponse, ProductMaster } from '@listingko/shared-types';
-import Database from '@/lib/database';
+import { Database } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
+import { corsResponse } from '@/lib/cors';
 import { analyzeProduct } from '@/lib/ai';
 
 export const runtime = 'nodejs';
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return corsResponse(null, { status: 204 });
+}
 
 // POST /api/products/:id/analyze
 export async function POST(
@@ -14,7 +20,7 @@ export async function POST(
   try {
     const userId = await getAuthUser(request);
     if (!userId) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -22,14 +28,14 @@ export async function POST(
             code: 'UNAUTHORIZED',
             message: 'Authentication required',
           },
-        } as unknown as ApiResponse,
+        } as ApiResponse,
         { status: 401 }
       );
     }
 
     const product = await Database.getProduct(params.id, userId);
     if (!product) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -37,7 +43,7 @@ export async function POST(
             code: 'NOT_FOUND',
             message: 'Product not found',
           },
-        } as unknown as ApiResponse,
+        } as ApiResponse,
         { status: 404 }
       );
     }
@@ -45,7 +51,7 @@ export async function POST(
     // Check if already analyzed
     const existing = await Database.getProductMaster(params.id, userId);
     if (existing) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: true,
           data: existing,
@@ -90,7 +96,7 @@ export async function POST(
         status: 'READY',
       });
 
-      return NextResponse.json(
+      return corsResponse(
         {
           success: true,
           data: productMaster,
@@ -108,7 +114,7 @@ export async function POST(
     }
   } catch (error) {
     console.error('POST /api/products/:id/analyze error:', error);
-    return NextResponse.json(
+    return corsResponse(
       {
         success: false,
         data: null,
@@ -116,7 +122,7 @@ export async function POST(
           code: error instanceof Error && error.message.includes('Claude') ? 'AI_ERROR' : 'INTERNAL_ERROR',
           message: error instanceof Error ? error.message : 'Failed to analyze product',
         },
-      } as unknown as ApiResponse,
+      } as ApiResponse,
       { status: 500 }
     );
   }

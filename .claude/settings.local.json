@@ -68,7 +68,13 @@
       "Bash(pkill -f \"npm.*web\" && sleep 2 && npm run dev --prefix apps/web > /tmp/web-dev.log 2>&1 & *)",
       "Bash(pkill -9 -f \"npm.*web\")",
       "Bash(killall -9 node)",
-      "Bash(curl -s http://localhost:3001/dashboard)"
+      "Bash(curl -s http://localhost:3001/dashboard)",
+      "Bash(rm -rf /Users/rvin.aca/Documents/ListingKo/apps/web/.next)",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/analyze && ls -la /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/)",
+      "Bash(mkdir -p '/Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/analyze' && ls -la '/Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/')",
+      "Bash(pkill -9 \"node.*api\")",
+      "Bash(curl -s http://localhost:3000/api/products -H 'Authorization: Bearer dev-test-token' -H 'Content-Type: application/json')"
     ]
   }
 }

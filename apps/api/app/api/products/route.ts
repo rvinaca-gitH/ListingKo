@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
-import { ApiResponse, CreateProductInput, Product } from '@listingko/shared-types';
+import { ApiResponse, CreateProductInput, Product, PaginatedResponse } from '@listingko/shared-types';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
+import { Database } from '@/lib/database';
 
 export const runtime = 'nodejs';
 
@@ -10,7 +11,7 @@ export async function OPTIONS() {
   return corsResponse(null, { status: 204 });
 }
 
-// GET /api/products
+// GET /api/products - List user's products
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUser(request);
@@ -23,21 +24,28 @@ export async function GET(request: NextRequest) {
             code: 'UNAUTHORIZED',
             message: 'Authentication required',
           },
-        } as unknown as ApiResponse,
+        } as ApiResponse,
         { status: 401 }
       );
     }
 
-    // MOCK: Return empty list for testing
+    // Get pagination params
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+    const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+
+    // Fetch from database
+    const { data: products, total } = await Database.listProducts(userId, limit, offset);
+
     return corsResponse({
       success: true,
       data: {
-        items: [],
-        total: 0,
-        hasMore: false,
-      },
+        items: products,
+        total,
+        hasMore: offset + limit < total,
+      } as PaginatedResponse<Product>,
       error: null,
-    } as ApiResponse);
+    } as ApiResponse<PaginatedResponse<Product>>);
   } catch (error) {
     console.error('GET /api/products error:', error);
     return corsResponse(
@@ -54,7 +62,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/products
+// POST /api/products - Create new product
 export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUser(request);
@@ -67,7 +75,7 @@ export async function POST(request: NextRequest) {
             code: 'UNAUTHORIZED',
             message: 'Authentication required',
           },
-        } as unknown as ApiResponse,
+        } as ApiResponse,
         { status: 401 }
       );
     }
@@ -90,23 +98,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // MOCK: Return mock product for testing (no database)
-    const mockProduct: Product = {
-      id: 'prod-' + Date.now(),
+    // Create product in database
+    const product = await Database.createProduct({
       user_id: userId,
       title: body.title.trim(),
       description: body.description?.trim() || '',
       category: body.category?.trim() || '',
       status: 'DRAFT',
       free_tier_used: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    });
 
     return corsResponse(
       {
         success: true,
-        data: mockProduct,
+        data: product,
         error: null,
       } as ApiResponse<Product>,
       { status: 201 }
