@@ -8,7 +8,26 @@
       "Bash(npm --version)",
       "Bash(npm install *)",
       "Bash(~/.npm-global/bin/pnpm --version)",
-      "Bash(~/.npm-global/bin/pnpm install *)"
+      "Bash(~/.npm-global/bin/pnpm install *)",
+      "Bash(supabase init *)",
+      "Bash(~/.npm-global/bin/npm install *)",
+      "Bash(~/.npm-global/bin/supabase --version)",
+      "Bash(supabase --version)",
+      "Bash(~/.npm-global/bin/pnpm add *)",
+      "Bash(~/.npm-global/bin/pnpm exec *)",
+      "Bash(docker --version)",
+      "Bash(brew --version)",
+      "Bash(brew install *)",
+      "Bash(./node_modules/.bin/supabase init *)",
+      "Bash(~/.npm-global/bin/pnpm supabase *)",
+      "Bash(npx @supabase/cli@latest init --create-docker-compose)",
+      "Bash(supabase start *)",
+      "Bash(open -a Docker)",
+      "Bash(open /Applications/Docker.app)",
+      "Bash(rm -f ~/.docker/config.json)",
+      "Bash(docker login *)",
+      "Bash(supabase status *)",
+      "Bash(~/.npm-global/bin/pnpm type-check *)"
     ]
   }
 }
