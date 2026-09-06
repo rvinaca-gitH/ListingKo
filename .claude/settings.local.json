@@ -40,7 +40,12 @@
       "Bash(pkill -f \"next dev\")",
       "Bash(tail -30 /tmp/api.log)",
       "Bash(pnpm add *)",
-      "Bash(curl -i -X OPTIONS http://localhost:3000/api/products -H 'Origin: http://localhost:3001' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type')"
+      "Bash(curl -i -X OPTIONS http://localhost:3000/api/products -H 'Origin: http://localhost:3001' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type')",
+      "Bash(pkill -9 node)",
+      "Bash(pkill -9 next)",
+      "Bash(pkill -9 pnpm)",
+      "Bash(pkill -15 -f \"next\\\\|pnpm\\\\|node.*dev\\\\|node.*start\")",
+      "Bash(pkill -9 -f \"node\")"
     ]
   }
 }

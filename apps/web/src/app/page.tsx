@@ -17,9 +17,15 @@ export default function Home() {
   const checkAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('Auth check - session is:', session ? 'exists' : 'null');
+      if (session?.user) {
+        console.log('Auth check - user ID:', session.user.id);
+        console.log('Auth check - user email:', session.user.email);
+      }
       setUser(session?.user || null);
     } catch (error) {
       console.error('Auth check failed:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
