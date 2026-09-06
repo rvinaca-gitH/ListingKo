@@ -51,7 +51,13 @@
       "Bash(awk '{print $2}')",
       "Bash(xargs kill -9)",
       "Bash(pkill -9 -f \"next start\")",
-      "Bash(pkill -9 -f \"node\\\\|next\")"
+      "Bash(pkill -9 -f \"node\\\\|next\")",
+      "Bash(pkill -9 -f \"next|node\")",
+      "Bash(pkill -9 -f \"pnpm.*start\\\\|next start\")",
+      "Bash(killall -9 node pnpm next)",
+      "Bash(kill -9 2867)",
+      "Bash(sleep 2 && tail -20 /tmp/api-start.log)",
+      "Bash(curl -s http://localhost:3000/api/products -H \"Authorization: Bearer test-token\")"
     ]
   }
 }
