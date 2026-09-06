@@ -184,6 +184,22 @@ export class ApiClient {
     });
     return response.data;
   }
+
+  // OAuth
+  static async getOAuthUrl(marketplace: string): Promise<string> {
+    const response = await this.fetch<any>('/api/oauth/authorize', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace }),
+    });
+    return response.data?.authorizationUrl || '';
+  }
+
+  static async startOAuth(marketplace: string): Promise<void> {
+    const url = await this.getOAuthUrl(marketplace);
+    if (url) {
+      window.location.href = url;
+    }
+  }
 }
 
 const apiClient = {
@@ -201,6 +217,8 @@ const apiClient = {
   createMarketplaceConnection: ApiClient.createMarketplaceConnection.bind(ApiClient),
   deleteMarketplaceConnection: ApiClient.deleteMarketplaceConnection.bind(ApiClient),
   publishListing: ApiClient.publishListing.bind(ApiClient),
+  getOAuthUrl: ApiClient.getOAuthUrl.bind(ApiClient),
+  startOAuth: ApiClient.startOAuth.bind(ApiClient),
 };
 
 export { apiClient };
