@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { ApiResponse, CreateProductInput, Product } from '@listingko/shared-types';
+import { ApiResponse, CreateProductInput, UpdateProductInput, Product, PaginatedResponse } from '@listingko/shared-types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -56,6 +56,13 @@ export class ApiClient {
     return response.data;
   }
 
+  static async getProducts(): Promise<ApiResponse<PaginatedResponse<Product>>> {
+    const response = await this.fetch<PaginatedResponse<Product>>('/api/products', {
+      method: 'GET',
+    });
+    return response;
+  }
+
   static async getProduct(id: string): Promise<any> {
     const response = await this.fetch<any>(`/api/products/${id}`, {
       method: 'GET',
@@ -69,6 +76,14 @@ export class ApiClient {
       method: 'GET',
     });
     return response.data?.items || [];
+  }
+
+  static async updateProduct(id: string, input: UpdateProductInput): Promise<ApiResponse<Product>> {
+    const response = await this.fetch<Product>(`/api/products/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+    return response;
   }
 
   // Analyze
@@ -107,4 +122,16 @@ export class ApiClient {
   }
 }
 
+const apiClient = {
+  createProduct: ApiClient.createProduct.bind(ApiClient),
+  getProducts: ApiClient.getProducts.bind(ApiClient),
+  getProduct: ApiClient.getProduct.bind(ApiClient),
+  listProducts: ApiClient.listProducts.bind(ApiClient),
+  updateProduct: ApiClient.updateProduct.bind(ApiClient),
+  analyzeProduct: ApiClient.analyzeProduct.bind(ApiClient),
+  generateListings: ApiClient.generateListings.bind(ApiClient),
+  generateListing: ApiClient.generateListing.bind(ApiClient),
+};
+
+export { apiClient };
 export default ApiClient;

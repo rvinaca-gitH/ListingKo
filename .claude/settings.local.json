@@ -60,7 +60,12 @@
       "Bash(curl -s http://localhost:3000/api/products -H \"Authorization: Bearer test-token\")",
       "Bash(pkill -9 -f \"node|pnpm|next\")",
       "Bash(curl -s -X GET http://localhost:3000/api/products -H 'Authorization: Bearer test-token' -H 'Content-Type: application/json')",
-      "Bash(curl -s -X POST http://localhost:3000/api/products -H 'Authorization: Bearer test-token' -H 'Content-Type: application/json' -d '{ *)"
+      "Bash(curl -s -X POST http://localhost:3000/api/products -H 'Authorization: Bearer test-token' -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(pnpm build *)",
+      "Bash(npm run *)",
+      "Bash(npm start *)",
+      "Bash(pkill -f \"npm.*web\")",
+      "Bash(pkill -f \"npm.*web\" && sleep 2 && npm run dev --prefix apps/web > /tmp/web-dev.log 2>&1 & *)"
     ]
   }
 }
