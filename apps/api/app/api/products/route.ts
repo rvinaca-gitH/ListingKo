@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse, CreateProductInput, Product } from '@listingko/shared-types';
-import Database from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 
@@ -29,17 +28,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const limit = Math.min(Number(request.nextUrl.searchParams.get('limit') || 50), 100);
-    const offset = Number(request.nextUrl.searchParams.get('offset') || 0);
-
-    const { data, total } = await Database.listProducts(userId, limit, offset);
-
+    // MOCK: Return empty list for testing
     return corsResponse({
       success: true,
       data: {
-        items: data,
-        total,
-        hasMore: offset + limit < total,
+        items: [],
+        total: 0,
+        hasMore: false,
       },
       error: null,
     } as ApiResponse);
@@ -95,19 +90,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const product = await Database.createProduct({
+    // MOCK: Return mock product for testing (no database)
+    const mockProduct: Product = {
+      id: 'prod-' + Date.now(),
       user_id: userId,
       title: body.title.trim(),
-      description: body.description?.trim(),
-      category: body.category?.trim(),
+      description: body.description?.trim() || '',
+      category: body.category?.trim() || '',
       status: 'DRAFT',
       free_tier_used: false,
-    });
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
     return corsResponse(
       {
         success: true,
-        data: product,
+        data: mockProduct,
         error: null,
       } as ApiResponse<Product>,
       { status: 201 }
