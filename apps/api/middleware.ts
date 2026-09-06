@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import Cors from 'next-cors';
 
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
+const cors = Cors({
+  allowMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  allowCredentials: true,
+});
 
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-auth-token');
-  response.headers.set('Access-Control-Max-Age', '86400');
-
-  return response;
+export async function middleware(request: NextRequest) {
+  return cors(request, async () => {
+    return new Response('OK');
+  });
 }
 
 export const config = {
