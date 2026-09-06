@@ -27,7 +27,10 @@
       "Bash(rm -f ~/.docker/config.json)",
       "Bash(docker login *)",
       "Bash(supabase status *)",
-      "Bash(~/.npm-global/bin/pnpm type-check *)"
+      "Bash(~/.npm-global/bin/pnpm type-check *)",
+      "Bash(pkill -f \"turbo run dev\")",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s http://localhost:3001)"
     ]
   }
 }

@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",
+    "dev:web": "turbo run dev --filter='@listingko/api' --filter='@listingko/web' --parallel",
     "build": "turbo run build",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
