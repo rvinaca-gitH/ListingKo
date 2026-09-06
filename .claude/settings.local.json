@@ -35,7 +35,10 @@
       "Bash(supabase db *)",
       "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/'[id]')",
       "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/listings/'[id]')",
-      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/images/'[id]')"
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/images/'[id]')",
+      "Bash(mv apps/web/src/components/components/* apps/web/src/components/ && rmdir apps/web/src/components/components)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(tail -30 /tmp/api.log)"
     ]
   }
 }

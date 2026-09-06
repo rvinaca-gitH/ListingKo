@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // Get auth token from headers
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '');
-
-  if (token) {
-    // Pass token through to API routes via custom header
-    response.headers.set('x-auth-token', token);
-  }
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-auth-token');
+  response.headers.set('Access-Control-Max-Age', '86400');
 
   return response;
 }

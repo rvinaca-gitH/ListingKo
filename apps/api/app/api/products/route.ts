@@ -2,15 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ApiResponse, CreateProductInput, Product } from '@listingko/shared-types';
 import Database from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
+import { corsResponse } from '@/lib/cors';
 
 export const runtime = 'nodejs';
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return corsResponse(null, { status: 204 });
+}
 
 // GET /api/products
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUser(request);
     if (!userId) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -28,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     const { data, total } = await Database.listProducts(userId, limit, offset);
 
-    return NextResponse.json({
+    return corsResponse({
       success: true,
       data: {
         items: data,
@@ -39,7 +45,7 @@ export async function GET(request: NextRequest) {
     } as ApiResponse);
   } catch (error) {
     console.error('GET /api/products error:', error);
-    return NextResponse.json(
+    return corsResponse(
       {
         success: false,
         data: null,
@@ -58,7 +64,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUser(request);
     if (!userId) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -75,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     // Validation
     if (!body.title || body.title.trim().length === 0) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -98,7 +104,7 @@ export async function POST(request: NextRequest) {
       free_tier_used: false,
     });
 
-    return NextResponse.json(
+    return corsResponse(
       {
         success: true,
         data: product,
@@ -108,7 +114,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('POST /api/products error:', error);
-    return NextResponse.json(
+    return corsResponse(
       {
         success: false,
         data: null,
