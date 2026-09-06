@@ -1,0 +1,106 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Environment variables (NEVER commit)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.test
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.iml
+
+# IDE settings (user-specific, but track templates)
+!.vscode/settings.json.template
+!.idea/runConfigurations/
+
+# Testing
+coverage/
+.nyc_output/
+.jest-cache/
+
+# Temporary files
+*.log
+logs/
+tmp/
+temp/
+
+# OS-specific
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Database backups
+*.sql
+postgres_data/
+
+# Cache
+.eslintcache
+.stylelintcache
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Mobile app specific
+android/app/debug/
+android/app/release/
+ios/Pods/
+ios/Podfile.lock
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Generated types
+packages/shared-types/generated/
+
+# Vercel
+.vercel/
+
+# Sensitive data
+secrets.json
+credentials.json
+service-account.json
+
+# Large files (don't commit videos, raw footage)
+*.mp4
+*.mov
+*.avi
+*.zip
+
+# Generated artifacts
+.LAST_BUILD
+.LAST_TEST
+
+# Editor temp
+*~
+*.tmp
+*.bak
