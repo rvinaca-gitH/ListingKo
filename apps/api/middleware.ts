@@ -1,16 +1,22 @@
-import { NextRequest } from 'next/server';
-import Cors from 'next-cors';
+import { NextRequest, NextResponse } from 'next/server';
 
-const cors = Cors({
-  allowMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-  allowCredentials: true,
-});
+export function middleware(request: NextRequest) {
+  // Handle preflight
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-auth-token',
+      },
+    });
+  }
 
-export async function middleware(request: NextRequest) {
-  return cors(request, async () => {
-    return new Response('OK');
-  });
+  // Pass through to route
+  const response = NextResponse.next();
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  return response;
 }
 
 export const config = {
