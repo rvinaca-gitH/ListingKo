@@ -30,7 +30,9 @@
       "Bash(~/.npm-global/bin/pnpm type-check *)",
       "Bash(pkill -f \"turbo run dev\")",
       "Bash(curl -s http://localhost:3000)",
-      "Bash(curl -s http://localhost:3001)"
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(supabase migration *)",
+      "Bash(supabase db *)"
     ]
   }
 }
