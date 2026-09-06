@@ -200,6 +200,46 @@ export class ApiClient {
       window.location.href = url;
     }
   }
+
+  // Images
+  static async uploadImage(productId: string, file: File): Promise<any> {
+    const token = await this.getAuthToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('productId', productId);
+
+    const response = await fetch(`${API_URL}/api/images/upload`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+
+    const data = (await response.json()) as any;
+    return data.data;
+  }
+
+  static async generateImages(productId: string): Promise<any[]> {
+    const response = await this.fetch<any>('/api/images/generate', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+    return response.data?.images || [];
+  }
+
+  static async deleteImage(imageId: string): Promise<void> {
+    await this.fetch<void>(`/api/images/${imageId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 const apiClient = {
@@ -219,6 +259,9 @@ const apiClient = {
   publishListing: ApiClient.publishListing.bind(ApiClient),
   getOAuthUrl: ApiClient.getOAuthUrl.bind(ApiClient),
   startOAuth: ApiClient.startOAuth.bind(ApiClient),
+  uploadImage: ApiClient.uploadImage.bind(ApiClient),
+  generateImages: ApiClient.generateImages.bind(ApiClient),
+  deleteImage: ApiClient.deleteImage.bind(ApiClient),
 };
 
 export { apiClient };
