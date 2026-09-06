@@ -3,6 +3,7 @@ import { ApiResponse } from '@listingko/shared-types';
 import { Database, supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
+import { MarketplaceAdapterFactory, MarketplaceCredentials } from '@/lib/marketplaces';
 
 export const runtime = 'nodejs';
 
@@ -101,33 +102,76 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       );
     }
 
-    // TODO: Implement marketplace-specific publishing logic
-    // For now, mock the publishing
-    const platformListingId = `${listing.platform}-${Date.now()}`;
+    // Get marketplace-specific adapter
+    const marketplaceCredentials: MarketplaceCredentials = {
+      accessToken: connection.data.oauth_token || '',
+      refreshToken: connection.data.oauth_refresh_token,
+      expiresAt: connection.data.oauth_expires_at ? new Date(connection.data.oauth_expires_at) : undefined,
+      shopId: connection.data.shop_id || '',
+      shopName: connection.data.shop_name || '',
+    };
+
+    const adapter = MarketplaceAdapterFactory.createAdapter(
+      listing.platform,
+      marketplaceCredentials
+    );
+
+    // Validate listing with marketplace-specific rules
+    const validation = await adapter.validateListing(listing);
+    if (!validation.valid) {
+      return corsResponse(
+        {
+          success: false,
+          data: null,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: `Listing validation failed: ${validation.errors?.join(', ')}`,
+          },
+        } as unknown as ApiResponse,
+        { status: 400 }
+      );
+    }
+
+    // Publish to marketplace
+    const publishResult = await adapter.publishListing(listing);
+    if (!publishResult.success) {
+      return corsResponse(
+        {
+          success: false,
+          data: null,
+          error: {
+            code: 'PUBLISH_ERROR',
+            message: publishResult.error,
+          },
+        } as unknown as ApiResponse,
+        { status: 400 }
+      );
+    }
 
     // Update listing with published info
-    const result = await supabase
+    const updateResult = await supabase
       .from('listings')
       .update({
         status: 'PUBLISHED',
         published_at: new Date().toISOString(),
-        platform_listing_id: platformListingId,
+        platform_listing_id: publishResult.platformListingId,
       })
       .eq('id', params.id)
       .select()
       .single();
 
-    if (result.error) {
-      throw result.error;
+    if (updateResult.error) {
+      throw updateResult.error;
     }
 
     return corsResponse(
       {
         success: true,
         data: {
-          listing: result.data,
-          platformListingId,
+          listing: updateResult.data,
+          platformListingId: publishResult.platformListingId,
           message: `Successfully published to ${listing.platform}`,
+          details: publishResult.details,
         },
         error: null,
       } as ApiResponse<any>,
