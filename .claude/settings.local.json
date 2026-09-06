@@ -32,7 +32,10 @@
       "Bash(curl -s http://localhost:3000)",
       "Bash(curl -s http://localhost:3001)",
       "Bash(supabase migration *)",
-      "Bash(supabase db *)"
+      "Bash(supabase db *)",
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/'[id]')",
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/listings/'[id]')",
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/images/'[id]')"
     ]
   }
 }
