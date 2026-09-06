@@ -1,16 +1,96 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { ApiResponse, QAResult } from '@listingko/shared-types';
-import Database from '@/lib/database';
+import { Database } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
+import { corsResponse } from '@/lib/cors';
 
 export const runtime = 'nodejs';
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return corsResponse(null, { status: 204 });
+}
+
+// GET /api/qa-results?productId=... (Get QA results for product's listings)
+export async function GET(request: NextRequest) {
+  try {
+    const userId = await getAuthUser(request);
+    if (!userId) {
+      return corsResponse(
+        {
+          success: false,
+          data: null,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Authentication required',
+          },
+        } as unknown as ApiResponse,
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('productId');
+
+    if (!productId) {
+      return corsResponse(
+        {
+          success: false,
+          data: null,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'productId is required',
+          },
+        } as unknown as ApiResponse,
+        { status: 400 }
+      );
+    }
+
+    // Fetch all QA results for listings belonging to this product
+    const results = await Database.supabase
+      .from('qa_results')
+      .select(`
+        *,
+        listing:listings(id, platform, status)
+      `)
+      .eq('user_id', userId)
+      .eq('listings.product_id', productId)
+      .order('created_at', { ascending: false });
+
+    if (results.error) {
+      throw results.error;
+    }
+
+    return corsResponse(
+      {
+        success: true,
+        data: results.data || [],
+        error: null,
+      } as ApiResponse<QAResult[]>,
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('GET /api/qa-results error:', error);
+    return corsResponse(
+      {
+        success: false,
+        data: null,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to fetch QA results',
+        },
+      } as unknown as ApiResponse,
+      { status: 500 }
+    );
+  }
+}
 
 // POST /api/qa-results (Score a listing)
 export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUser(request);
     if (!userId) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -35,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     // Validation
     if (!body.listingId) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -51,7 +131,7 @@ export async function POST(request: NextRequest) {
     // Check listing exists and belongs to user
     const listing = await Database.getListing(body.listingId, userId);
     if (!listing) {
-      return NextResponse.json(
+      return corsResponse(
         {
           success: false,
           data: null,
@@ -99,7 +179,7 @@ export async function POST(request: NextRequest) {
       status: passed ? 'QA_PASSED' : 'QA_FAILED',
     });
 
-    return NextResponse.json(
+    return corsResponse(
       {
         success: true,
         data: qaResult,
@@ -109,7 +189,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('POST /api/qa-results error:', error);
-    return NextResponse.json(
+    return corsResponse(
       {
         success: false,
         data: null,

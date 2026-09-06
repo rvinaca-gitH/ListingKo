@@ -9,9 +9,9 @@ export async function getAuthUser(request: NextRequest): Promise<string | undefi
     return undefined;
   }
 
-  // Accept any token in dev mode
+  // Accept any token in dev mode - use consistent dev user ID
   console.log('[AUTH] TEMPORARY DEV BYPASS - accepting token');
-  return 'dev-user-' + Math.random().toString(36).substr(2, 9);
+  return '00000000-0000-0000-0000-000000000001';
 }
 
 export function requireAuth(userId: string | undefined): string {

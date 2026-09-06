@@ -74,7 +74,19 @@
       "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/analyze && ls -la /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/)",
       "Bash(mkdir -p '/Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/[id]/analyze' && ls -la '/Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/')",
       "Bash(pkill -9 \"node.*api\")",
-      "Bash(curl -s http://localhost:3000/api/products -H 'Authorization: Bearer dev-test-token' -H 'Content-Type: application/json')"
+      "Bash(curl -s http://localhost:3000/api/products -H 'Authorization: Bearer dev-test-token' -H 'Content-Type: application/json')",
+      "Bash(mkdir -p /Users/rvin.aca/Documents/ListingKo/apps/api/app/api/products/\\\\[id\\\\]/export)",
+      "Bash(pkill -f \"node.*next dev\")",
+      "Bash(kill -9 4723)",
+      "Bash(curl -s -X GET http://localhost:3000/api/products -H 'Authorization: Bearer dev-mock-token' -H 'Content-Type: application/json')",
+      "Bash(curl -v -X GET http://localhost:3000/api/products -H 'Authorization: Bearer dev-mock-token' -H 'Content-Type: application/json')",
+      "Bash(curl -s -X POST http://127.0.0.1:54321/rest/v1/users -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxvY2FsaG9zdCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2MzAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.ey_q1cD4FLqTW-WX5iLhHlNJ1bKWJmlpjsLIB3L1Gg4' -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/products/ee1d9dc3-ac06-472e-92d3-1556167bdce5/analyze -H 'Authorization: Bearer dev-mock-token' -H 'Content-Type: application/json' -d '{}')",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer token' http://localhost:3000/api/products)",
+      "Bash(echo \"   GET /api/products → $\\(curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer token' http://localhost:3000/api/products\\)\")",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Authorization: Bearer token' -H 'Content-Type: application/json' -d '{\"title\":\"test\"}' http://localhost:3000/api/products)",
+      "Bash(echo \"   POST /api/products → $\\(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Authorization: Bearer token' -H 'Content-Type: application/json' -d '{\"title\":\"test\"}' http://localhost:3000/api/products\\)\")",
+      "Bash(curl -s -H \"Authorization: Bearer dev-mock-token\" http://localhost:3000/api/products)"
     ]
   }
 }

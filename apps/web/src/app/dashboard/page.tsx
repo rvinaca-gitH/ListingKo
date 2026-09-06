@@ -99,6 +99,14 @@ export default function DashboardHomePage() {
           <p className="text-gray-600">Turn your products into ready-to-sell listings with AI.</p>
           <p className="text-orange-500 font-semibold italic">List Smarter. Sell More.</p>
         </div>
+        <div>
+          <Link
+            href="/dashboard/settings/marketplace"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition"
+          >
+            ⚙️ Marketplace Settings
+          </Link>
+        </div>
         <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 w-64">
           <div className="mb-4">
             <p className="text-sm font-semibold text-gray-900 mb-3">One product. Endless possibilities.</p>

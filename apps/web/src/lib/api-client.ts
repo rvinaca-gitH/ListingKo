@@ -120,6 +120,70 @@ export class ApiClient {
     if (!response.data) throw new Error('Listing generation failed');
     return response.data;
   }
+
+  // QA Results
+  static async getQAResults(productId: string): Promise<any[]> {
+    const response = await this.fetch<any[]>(`/api/qa-results?productId=${productId}`, {
+      method: 'GET',
+    });
+    return response.data || [];
+  }
+
+  // Export
+  static async exportProduct(productId: string, format: 'json' | 'csv' | 'zip' | 'pdf'): Promise<Blob> {
+    const token = await this.getAuthToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/api/products/${productId}/export?format=${format}`, {
+      method: 'POST',
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+
+    return response.blob();
+  }
+
+  // Marketplace
+  static async getMarketplaceConnections(): Promise<any[]> {
+    const response = await this.fetch<any[]>('/api/marketplace-connections', {
+      method: 'GET',
+    });
+    return response.data || [];
+  }
+
+  static async createMarketplaceConnection(data: {
+    marketplace: string;
+    credentials?: any;
+    shopId?: string;
+    shopName?: string;
+  }): Promise<any> {
+    const response = await this.fetch<any>('/api/marketplace-connections', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+
+  static async deleteMarketplaceConnection(id: string): Promise<void> {
+    await this.fetch<void>(`/api/marketplace-connections/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Publishing
+  static async publishListing(listingId: string, marketplaceConnectionId: string): Promise<any> {
+    const response = await this.fetch<any>(`/api/listings/${listingId}/publish`, {
+      method: 'POST',
+      body: JSON.stringify({ marketplaceConnectionId }),
+    });
+    return response.data;
+  }
 }
 
 const apiClient = {
@@ -131,6 +195,12 @@ const apiClient = {
   analyzeProduct: ApiClient.analyzeProduct.bind(ApiClient),
   generateListings: ApiClient.generateListings.bind(ApiClient),
   generateListing: ApiClient.generateListing.bind(ApiClient),
+  getQAResults: ApiClient.getQAResults.bind(ApiClient),
+  exportProduct: ApiClient.exportProduct.bind(ApiClient),
+  getMarketplaceConnections: ApiClient.getMarketplaceConnections.bind(ApiClient),
+  createMarketplaceConnection: ApiClient.createMarketplaceConnection.bind(ApiClient),
+  deleteMarketplaceConnection: ApiClient.deleteMarketplaceConnection.bind(ApiClient),
+  publishListing: ApiClient.publishListing.bind(ApiClient),
 };
 
 export { apiClient };
