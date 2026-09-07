@@ -7,7 +7,21 @@ export default function RootLayout() {
         name="index"
         options={{
           title: 'ListingKo',
-          headerShown: true,
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="screens/new-product/index"
+        options={{
+          title: 'New Listing',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="screens/product/[id]"
+        options={{
+          title: 'Product',
+          headerShown: false,
         }}
       />
     </Stack>

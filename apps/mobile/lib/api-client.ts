@@ -108,10 +108,10 @@ export class MobileApiClient {
   }
 
   // Listings
-  static async generateListings(productId: string, platforms: string[]): Promise<any> {
+  static async generateListings(input: { productId: string; platforms: string[] }): Promise<any> {
     const response = await this.fetch<any>('/api/listings', {
       method: 'POST',
-      body: JSON.stringify({ productId, platforms }),
+      body: JSON.stringify(input),
     });
     return response.data;
   }

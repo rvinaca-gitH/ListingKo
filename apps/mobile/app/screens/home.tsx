@@ -86,7 +86,7 @@ export default function HomeScreen() {
                 <SectionHeader title="One product. Endless possibilities." link="See all ›" />
                 <View style={styles.channels}>{channels.map(([icon, label, tint, color]) => <View key={label} style={styles.channel}><View style={[styles.channelIcon, { backgroundColor: tint }]}><Text style={[styles.channelIconText, { color }]}>{icon}</Text></View><Text style={styles.channelLabel}>{label}</Text></View>)}</View>
 
-                <Pressable style={styles.primary} onPress={() => Alert.alert('New listing', 'Product creation is ready to connect here.')}><Text style={styles.primaryIcon}>✦</Text><View style={styles.primaryCopy}><Text style={styles.primaryTitle}>Create New Listing</Text><Text style={styles.primaryBody}>Upload photos, enter product info, or{'\n'}let AI do the rest.</Text></View><Text style={styles.primaryArrow}>›</Text></Pressable>
+                <Pressable style={styles.primary} onPress={() => router.push('/screens/new-product')}><Text style={styles.primaryIcon}>✦</Text><View style={styles.primaryCopy}><Text style={styles.primaryTitle}>Create New Listing</Text><Text style={styles.primaryBody}>Upload photos, enter product info, or{'\n'}let AI do the rest.</Text></View><Text style={styles.primaryArrow}>›</Text></Pressable>
 
                 <View style={styles.stats}>{[
                     ['▣', String(products.length), 'Total Products', '#FFF5E8', palette.orange],
