@@ -19,7 +19,7 @@ export default function ProductMasterView({ productId, onRefresh }: ProductMaste
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadProductMaster();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadProductMaster = async () => {

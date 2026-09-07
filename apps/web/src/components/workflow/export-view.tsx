@@ -8,7 +8,7 @@ interface ExportViewProps {
   onRefresh: () => void;
 }
 
-const EXPORT_FORMATS: Array<{id: 'pdf' | 'zip' | 'csv' | 'json'; name: string; description: string; icon: string}> = [
+const EXPORT_FORMATS: Array<{ id: 'pdf' | 'zip' | 'csv' | 'json'; name: string; description: string; icon: string }> = [
   {
     id: 'pdf',
     name: 'PDF Report',

@@ -17,7 +17,7 @@ export default function QAResultsView({ productId, onRefresh: _onRefresh }: QARe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadQAResults();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadQAResults = async () => {

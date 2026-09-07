@@ -29,7 +29,7 @@ export default function ProductPage() {
     if (productId) {
       loadProduct();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId, refreshTrigger]);
 
   const loadProduct = async () => {
@@ -113,11 +113,10 @@ export default function ProductPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition ${
-                activeTab === tab.id
+              className={`flex items-center gap-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition ${activeTab === tab.id
                   ? 'border-b-2 border-blue-600 text-blue-600'
                   : 'border-b-2 border-transparent text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>

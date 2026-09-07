@@ -26,7 +26,7 @@ export default function ListingsView({ productId, onRefresh }: ListingsViewProps
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadListings();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadListings = async () => {
@@ -143,10 +143,10 @@ export default function ListingsView({ productId, onRefresh }: ListingsViewProps
               </div>
               <span
                 className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${listing.status === 'QA_PASSED'
-                    ? 'bg-green-100 text-green-800'
-                    : listing.status === 'QA_FAILED'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                  ? 'bg-green-100 text-green-800'
+                  : listing.status === 'QA_FAILED'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
                   }`}
               >
                 {listing.status}
