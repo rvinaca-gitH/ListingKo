@@ -89,7 +89,8 @@
       "Bash(curl -s -H \"Authorization: Bearer dev-mock-token\" http://localhost:3000/api/products)",
       "Bash(pkill -f \"node.*port.*3000\")",
       "Bash(pkill -f \"node.*port.*3001\")",
-      "Bash(pkill -f \"next\")"
+      "Bash(pkill -f \"next\")",
+      "Bash(chmod +x /Users/rvin.aca/Documents/ListingKo/TEST_EDGE_FUNCTIONS.sh)"
     ]
   }
 }
