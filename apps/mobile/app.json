@@ -3,6 +3,7 @@
     "name": "ListingKo",
     "slug": "listingko",
     "version": "0.1.0",
+    "sdkVersion": "57.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "listingko",
