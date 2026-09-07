@@ -27,14 +27,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Allow ListingKo to access your photos",
-          "cameraPermission": "Allow ListingKo to access your camera"
-        }
-      ]
-    ]
+    "plugins": []
   }
 }
