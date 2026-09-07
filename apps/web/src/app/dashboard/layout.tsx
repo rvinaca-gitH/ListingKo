@@ -25,14 +25,22 @@ export default function DashboardLayout({
   const checkAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        router.push('/');
-      } else {
+      if (session?.user) {
         setUser(session.user);
+      } else if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        // In development mode, allow access without auth
+        setUser({ email: 'dev@example.com' });
+      } else {
+        router.push('/');
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      router.push('/');
+      if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        // In development, bypass auth errors
+        setUser({ email: 'dev@example.com' });
+      } else {
+        router.push('/');
+      }
     } finally {
       setLoading(false);
     }

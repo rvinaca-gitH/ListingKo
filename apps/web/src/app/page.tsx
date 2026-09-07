@@ -21,9 +21,16 @@ export default function Home() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         router.push('/dashboard');
+      } else if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        // In development mode, skip auth and go to dashboard
+        setTimeout(() => router.push('/dashboard'), 100);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      // In development, bypass auth errors
+      if (process.env.NEXT_PUBLIC_ENV === 'development') {
+        setTimeout(() => router.push('/dashboard'), 100);
+      }
     } finally {
       setLoading(false);
     }

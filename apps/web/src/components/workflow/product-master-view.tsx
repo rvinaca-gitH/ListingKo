@@ -40,14 +40,23 @@ export default function ProductMasterView({ productId, onRefresh }: ProductMaste
     try {
       setAnalyzing(true);
       setError(null);
+      console.log('Starting analyze for product:', productId);
       const response = await apiClient.analyzeProduct(productId);
-      if (response.success) {
+      console.log('Analyze response:', response);
+
+      if (response && response.data) {
         setMaster(response.data);
         onRefresh();
+      } else if (response) {
+        // Response might be the data directly
+        setMaster(response);
+        onRefresh();
+      } else {
+        throw new Error('No data returned from analysis');
       }
     } catch (err) {
       console.error('Failed to analyze product:', err);
-      setError('Failed to analyze product. Please try again.');
+      setError(`Failed to analyze product: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setAnalyzing(false);
     }
