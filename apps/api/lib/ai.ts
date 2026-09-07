@@ -91,7 +91,7 @@ Provide a JSON response with this exact structure (no markdown):
   try {
     const parsed = JSON.parse(response);
     return parsed as ProductMaster;
-  } catch (error) {
+  } catch {
     console.error('Failed to parse Claude response:', response);
     throw new Error('Failed to parse product analysis response');
   }
@@ -151,7 +151,7 @@ Respond with JSON (no markdown):
   try {
     const parsed = JSON.parse(response);
     return parsed;
-  } catch (error) {
+  } catch {
     console.error('Failed to parse listing response:', response);
     throw new Error('Failed to generate listing');
   }
@@ -209,7 +209,7 @@ Respond with JSON (no markdown):
   try {
     const parsed = JSON.parse(response);
     return parsed;
-  } catch (error) {
+  } catch {
     console.error('Failed to parse QA score response:', response);
     throw new Error('Failed to score listing');
   }
@@ -249,7 +249,7 @@ Respond with JSON (no markdown):
   try {
     const parsed = JSON.parse(response);
     return { title: parsed.title, description: parsed.description };
-  } catch (error) {
+  } catch {
     console.error('Failed to parse repair response:', response);
     throw new Error('Failed to repair listing');
   }

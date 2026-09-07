@@ -1,10 +1,13 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-insecure-key-change-in-production';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const ALGORITHM = 'aes-256-gcm';
 
 // Derive a key from the encryption key
 function getKey(): Buffer {
+  if (!ENCRYPTION_KEY) {
+    throw new Error('ENCRYPTION_KEY must be configured before encrypting credentials');
+  }
   return scryptSync(ENCRYPTION_KEY, 'salt', 32);
 }
 

@@ -9,8 +9,11 @@ export default function Home() {
   const [signingIn, setSigningIn] = useState(false);
   const router = useRouter();
 
+  // Authentication is checked once when the landing page mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     checkAuth();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {

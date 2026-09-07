@@ -103,7 +103,10 @@
       "Bash(pkill -f \"expo\")",
       "Bash(pkill -f \"npm install\")",
       "Bash(pkill -9 -f \"expo\")",
-      "Bash(pkill -9 -f \"metro\")"
+      "Bash(pkill -9 -f \"metro\")",
+      "Bash(pkill -9 -f \"expo\\\\|metro\")",
+      "Bash(pkill -9 -f \"npm\\\\|expo\\\\|metro\")",
+      "Bash(pkill -9 -f \"expo\\\\|metro\\\\|npm\")"
     ]
   }
 }

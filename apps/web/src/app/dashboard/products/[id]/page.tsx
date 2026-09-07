@@ -23,10 +23,13 @@ export default function ProductPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Reload when the selected product or refresh trigger changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (productId) {
       loadProduct();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId, refreshTrigger]);
 
   const loadProduct = async () => {

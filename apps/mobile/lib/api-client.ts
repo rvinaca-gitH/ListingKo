@@ -8,11 +8,6 @@ export class MobileApiClient {
     try {
       const token = await AsyncStorage.getItem('auth_token');
       if (!token) {
-        // Dev mode: use mock token
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('[DEV MODE] Using mock auth token');
-          return 'dev-mock-token-' + Date.now();
-        }
         return null;
       }
       return token;

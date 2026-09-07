@@ -16,7 +16,7 @@ const MARKETPLACES = [
   { id: 'facebook', name: 'Facebook', icon: '📘' },
 ];
 
-export default function PublishWorkflow({ listings, productId }: PublishWorkflowProps) {
+export default function PublishWorkflow({ listings, productId: _productId }: PublishWorkflowProps) {
   const [connections, setConnections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState<string | null>(null);

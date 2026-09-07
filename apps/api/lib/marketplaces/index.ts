@@ -4,7 +4,8 @@ import { LazadaAdapter } from './lazada-adapter';
 import { TikTokAdapter } from './tiktok-adapter';
 import { FacebookAdapter } from './facebook-adapter';
 
-export { MarketplaceAdapter, MarketplaceCredentials, PublishResult } from './base-adapter';
+export { MarketplaceAdapter } from './base-adapter';
+export type { MarketplaceCredentials, PublishResult } from './base-adapter';
 
 export class MarketplaceAdapterFactory {
   static createAdapter(

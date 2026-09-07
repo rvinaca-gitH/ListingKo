@@ -1,9 +1,11 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse } from '@listingko/shared-types';
+import { supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 import { MarketplaceAdapterFactory, MarketplaceCredentials } from '@/lib/marketplaces';
 import { randomBytes } from 'crypto';
+import { SUPPORTED_MARKETPLACES } from '@/lib/marketplaces/supported';
 
 export const runtime = 'nodejs';
 
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
       marketplace: string;
     };
 
-    if (!body.marketplace) {
+    if (!SUPPORTED_MARKETPLACES.includes(body.marketplace as (typeof SUPPORTED_MARKETPLACES)[number])) {
       return corsResponse(
         {
           success: false,
@@ -51,8 +53,14 @@ export async function POST(request: NextRequest) {
     // Generate state for CSRF protection
     const state = randomBytes(32).toString('hex');
 
-    // TODO: Store state in cache/database with expiration to verify later
-    // For now, just use it directly
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const stateRecord = await supabase
+      .from('oauth_states')
+      .insert({ state, user_id: userId, marketplace: body.marketplace, expires_at: expiresAt });
+
+    if (stateRecord.error) {
+      throw stateRecord.error;
+    }
 
     // Create adapter to get authorization URL
     const mockCredentials: MarketplaceCredentials = {

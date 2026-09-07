@@ -1,17 +1,22 @@
 import { NextRequest } from 'next/server';
+import { supabase } from '@/lib/database';
 
 export async function getAuthUser(request: NextRequest): Promise<string | undefined> {
-  // TEMPORARY DEV MODE: bypass all auth checks for testing
-  const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
-                request.headers.get('x-auth-token') || '';
+  const authorization = request.headers.get('authorization');
+  const token = authorization?.startsWith('Bearer ')
+    ? authorization.slice('Bearer '.length).trim()
+    : request.headers.get('x-auth-token')?.trim();
 
   if (!token) {
     return undefined;
   }
 
-  // Accept any token in dev mode - use consistent dev user ID
-  console.log('[AUTH] TEMPORARY DEV BYPASS - accepting token');
-  return '00000000-0000-0000-0000-000000000001';
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) {
+    return undefined;
+  }
+
+  return data.user.id;
 }
 
 export function requireAuth(userId: string | undefined): string {

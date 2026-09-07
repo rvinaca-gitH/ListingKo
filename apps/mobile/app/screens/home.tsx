@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { apiClient } from '../lib/api-client';
+import { Product } from '@listingko/shared-types';
+import { apiClient } from '../../lib/api-client';
 
 const styles = StyleSheet.create({
   container: {
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

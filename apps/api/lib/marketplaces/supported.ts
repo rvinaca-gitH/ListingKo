@@ -1,0 +1,1 @@
+export const SUPPORTED_MARKETPLACES = ['shopee', 'lazada', 'tiktok', 'facebook'] as const;

@@ -15,17 +15,19 @@ export default function ProductMasterView({ productId, onRefresh }: ProductMaste
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reload when the selected product changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadProductMaster();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadProductMaster = async () => {
     try {
       setLoading(true);
       setError(null);
-      // Note: We'll need a getProductMaster API endpoint
-      // For now, this is a placeholder that will be filled when API is ready
-      console.log('Loading Product Master for', productId);
+      const product = await apiClient.getProduct(productId);
+      setMaster(product.productMaster || null);
     } catch (err) {
       console.error('Failed to load Product Master:', err);
       setError('Failed to load Product Master');
@@ -77,7 +79,7 @@ export default function ProductMasterView({ productId, onRefresh }: ProductMaste
             <div className="flex-1">
               <h3 className="font-semibold text-blue-900">AI Product Analysis</h3>
               <p className="text-sm text-blue-800 mt-1">
-                Click "Analyze" to let AI extract product insights, identify strengths, and generate SEO keywords.
+                Click &quot;Analyze&quot; to let AI extract product insights, identify strengths, and generate SEO keywords.
               </p>
             </div>
             <button
@@ -180,8 +182,8 @@ export default function ProductMasterView({ productId, onRefresh }: ProductMaste
                   {master.seo_score >= 80
                     ? 'Excellent SEO optimization'
                     : master.seo_score >= 60
-                    ? 'Good SEO optimization'
-                    : 'Needs SEO improvement'}
+                      ? 'Good SEO optimization'
+                      : 'Needs SEO improvement'}
                 </p>
                 <p className="text-xs text-blue-700 mt-1">Confidence: {master.confidence_score}%</p>
               </div>

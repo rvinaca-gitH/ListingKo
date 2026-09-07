@@ -22,16 +22,18 @@ export default function ListingsView({ productId, onRefresh }: ListingsViewProps
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reload when the selected product changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadListings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadListings = async () => {
     try {
       setLoading(true);
-      // Note: We'll need a getListings API endpoint
-      // For now, this is a placeholder
-      console.log('Loading listings for', productId);
+      const product = await apiClient.getProduct(productId);
+      setListings(product.listings || []);
     } catch (err) {
       console.error('Failed to load listings:', err);
     } finally {
@@ -43,14 +45,9 @@ export default function ListingsView({ productId, onRefresh }: ListingsViewProps
     try {
       setGenerating(true);
       setError(null);
-      const response = await apiClient.generateListings({
-        productId,
-        platforms: ['shopee', 'lazada', 'tiktok', 'facebook'],
-      });
-      if (response.success) {
-        setListings(response.data?.results?.map((r: any) => r.listing) || []);
-        onRefresh();
-      }
+      const response = await apiClient.generateListings(productId, ['shopee', 'lazada', 'tiktok', 'facebook']);
+      setListings(response?.items || []);
+      onRefresh();
     } catch (err) {
       console.error('Failed to generate listings:', err);
       setError('Failed to generate listings. Please try again.');
@@ -145,13 +142,12 @@ export default function ListingsView({ productId, onRefresh }: ListingsViewProps
                 <p className="text-sm text-gray-500 mt-1">{listing.title}</p>
               </div>
               <span
-                className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                  listing.status === 'QA_PASSED'
+                className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${listing.status === 'QA_PASSED'
                     ? 'bg-green-100 text-green-800'
                     : listing.status === 'QA_FAILED'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}
               >
                 {listing.status}
               </span>

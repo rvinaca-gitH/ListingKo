@@ -9,12 +9,15 @@ interface QAResultsViewProps {
   onRefresh: () => void;
 }
 
-export default function QAResultsView({ productId, onRefresh }: QAResultsViewProps) {
+export default function QAResultsView({ productId, onRefresh: _onRefresh }: QAResultsViewProps) {
   const [qaResults, setQaResults] = useState<QAResult[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Reload when the selected product changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadQAResults();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const loadQAResults = async () => {
@@ -108,9 +111,8 @@ export default function QAResultsView({ productId, onRefresh }: QAResultsViewPro
                 </p>
               </div>
               <span
-                className={`inline-block px-4 py-2 font-semibold rounded-full ${
-                  result.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}
+                className={`inline-block px-4 py-2 font-semibold rounded-full ${result.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
               >
                 {result.total_score >= 85 ? 'PASSED' : 'FAILED'}
               </span>

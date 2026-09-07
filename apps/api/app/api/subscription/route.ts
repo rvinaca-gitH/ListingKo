@@ -4,6 +4,7 @@ import Database from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // GET /api/subscription
 export async function GET(request: NextRequest) {

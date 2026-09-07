@@ -27,17 +27,11 @@ export class TikTokAdapter extends MarketplaceAdapter {
   }
 
   async exchangeCodeForToken(code: string): Promise<MarketplaceCredentials> {
-    console.log('TikTok: Exchanging code for token:', code);
-    return {
-      accessToken: `tiktok_token_${Date.now()}`,
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error(`TikTok Shop OAuth exchange is not configured for code ${code}`);
   }
 
   async refreshAccessToken(): Promise<MarketplaceCredentials> {
-    console.log('TikTok: Refreshing access token');
-    return this.credentials;
+    throw new Error('TikTok Shop token refresh is not configured');
   }
 
   async validateListing(listing: Listing): Promise<{ valid: boolean; errors?: string[] }> {
@@ -72,22 +66,7 @@ export class TikTokAdapter extends MarketplaceAdapter {
     }
 
     try {
-      const platformListingId = `tiktok_${Date.now()}`;
-      console.log('TikTok: Publishing listing:', {
-        listingId: listing.id,
-        title: listing.title,
-        platformListingId,
-      });
-
-      return {
-        success: true,
-        platformListingId,
-        details: {
-          marketplace: 'tiktok',
-          publishedAt: new Date().toISOString(),
-          shopId: this.credentials.shopId,
-        },
-      };
+      return { success: false, error: 'TikTok Shop publishing is not configured' };
     } catch (error) {
       return {
         success: false,
@@ -96,20 +75,17 @@ export class TikTokAdapter extends MarketplaceAdapter {
     }
   }
 
-  async updateListing(platformListingId: string, listing: Listing): Promise<PublishResult> {
-    console.log('TikTok: Updating listing:', platformListingId);
-    return { success: true, platformListingId };
+  async updateListing(platformListingId: string, _listing: Listing): Promise<PublishResult> {
+    return { success: false, error: `TikTok Shop update is not configured for ${platformListingId}` };
   }
 
   async unpublishListing(platformListingId: string): Promise<PublishResult> {
-    console.log('TikTok: Unpublishing listing:', platformListingId);
-    return { success: true, platformListingId };
+    return { success: false, error: `TikTok Shop unpublish is not configured for ${platformListingId}` };
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
-      console.log('TikTok: Validating credentials');
-      return true;
+      return false;
     } catch (error) {
       console.error('TikTok credential validation failed:', error);
       return false;
@@ -117,9 +93,6 @@ export class TikTokAdapter extends MarketplaceAdapter {
   }
 
   async getShopInfo(): Promise<Record<string, any>> {
-    return {
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error('TikTok Shop lookup is not configured');
   }
 }

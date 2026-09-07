@@ -1,9 +1,7 @@
-import { Anthropic } from '@anthropic-ai/sdk';
 import { supabase } from '@/lib/database';
+import { uploadImage } from './image-processor';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const STABILITY_API_URL = `${process.env.STABILITY_API_HOST || 'https://api.stability.ai'}/v2beta/stable-image/generate/core`;
 
 export interface AIImageGenerationInput {
   productId: string;
@@ -37,43 +35,55 @@ function generateImagePrompt(input: AIImageGenerationInput): string {
 }
 
 /**
- * Generate AI image using Claude Vision API
- * Note: This uses Claude for image analysis, not generation
- * For actual generation, integrate with DALL-E, Midjourney, or similar
+ * Generate an image through Stability AI and persist the returned asset.
  */
 export async function generateAIImage(input: AIImageGenerationInput): Promise<AIGeneratedImage> {
   try {
     const prompt = generateImagePrompt(input);
 
-    // TODO: Integrate with actual image generation API (DALL-E, Midjourney, etc.)
-    // For now, return a mock implementation with descriptive logging
+    const apiKey = process.env.STABILITY_API_KEY;
+    if (!apiKey) {
+      throw new Error('STABILITY_API_KEY is not configured');
+    }
 
-    console.log('AI Image Generation Request:', {
-      productId: input.productId,
-      productName: input.productName,
-      imageType: input.imageType,
-      prompt,
+    const formData = new FormData();
+    formData.append('prompt', prompt);
+    formData.append('output_format', 'png');
+    formData.append('aspect_ratio', '3:2');
+
+    const response = await fetch(STABILITY_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: 'image/*',
+      },
+      body: formData,
     });
 
-    // Mock generated image ID
-    const mockImageUrl = `https://placeholder.com/1200x800?text=${encodeURIComponent(input.productName)}`;
-    const mockImageId = `ai_${Date.now()}`;
+    if (!response.ok) {
+      throw new Error(`Stability image generation failed with status ${response.status}`);
+    }
 
-    // Store in database
+    const imageBuffer = Buffer.from(await response.arrayBuffer());
+    const uploadedImage = await uploadImage({
+      productId: input.productId,
+      userId: input.userId,
+      buffer: imageBuffer,
+      filename: `ai-${input.imageType}-${Date.now()}.png`,
+      mimeType: 'image/png',
+    });
+
     const imageRecord = await supabase
       .from('images')
-      .insert({
-        product_id: input.productId,
-        user_id: input.userId,
-        url_original: mockImageUrl,
+      .update({
         type: 'AI_GENERATED',
         ai_prompt: prompt,
-        ai_version: 'claude-3-5-sonnet',
-        ai_model: 'image-generation-mock',
+        ai_version: 'stable-image-core',
+        ai_model: 'stability-ai',
         purposes: [input.imageType],
-        width: 1200,
-        height: 800,
       })
+      .eq('id', uploadedImage.imageId)
+      .eq('user_id', input.userId)
       .select()
       .single();
 
@@ -84,10 +94,10 @@ export async function generateAIImage(input: AIImageGenerationInput): Promise<AI
     return {
       imageId: imageRecord.data.id,
       prompt,
-      aiModel: 'image-generation-mock',
-      aiVersion: 'claude-3-5-sonnet',
+      aiModel: 'stability-ai',
+      aiVersion: 'stable-image-core',
       imageType: input.imageType,
-      urlOriginal: mockImageUrl,
+      urlOriginal: imageRecord.data.url_original,
     };
   } catch (error) {
     console.error('Error generating AI image:', error);
@@ -137,16 +147,7 @@ export async function generateImageVariations(
  */
 export async function analyzeProductImage(imageUrl: string, productContext: string): Promise<string> {
   try {
-    // TODO: Implement image analysis using Claude Vision API
-    // This would extract product features, quality assessment, etc.
-
-    console.log('Image Analysis Request:', {
-      imageUrl,
-      productContext,
-    });
-
-    // Mock analysis response
-    return 'Product image appears to be high quality with good lighting and clear product visibility. Suitable for ecommerce listings.';
+    throw new Error(`Image analysis is not configured for ${imageUrl} and product context ${productContext}`);
   } catch (error) {
     console.error('Error analyzing image:', error);
     throw error;

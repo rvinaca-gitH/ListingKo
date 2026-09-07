@@ -27,17 +27,11 @@ export class FacebookAdapter extends MarketplaceAdapter {
   }
 
   async exchangeCodeForToken(code: string): Promise<MarketplaceCredentials> {
-    console.log('Facebook: Exchanging code for token:', code);
-    return {
-      accessToken: `facebook_token_${Date.now()}`,
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error(`Facebook OAuth exchange is not configured for code ${code}`);
   }
 
   async refreshAccessToken(): Promise<MarketplaceCredentials> {
-    console.log('Facebook: Refreshing access token');
-    return this.credentials;
+    throw new Error('Facebook token refresh is not configured');
   }
 
   async validateListing(listing: Listing): Promise<{ valid: boolean; errors?: string[] }> {
@@ -69,22 +63,7 @@ export class FacebookAdapter extends MarketplaceAdapter {
     }
 
     try {
-      const platformListingId = `facebook_${Date.now()}`;
-      console.log('Facebook: Publishing listing:', {
-        listingId: listing.id,
-        title: listing.title,
-        platformListingId,
-      });
-
-      return {
-        success: true,
-        platformListingId,
-        details: {
-          marketplace: 'facebook',
-          publishedAt: new Date().toISOString(),
-          shopId: this.credentials.shopId,
-        },
-      };
+      return { success: false, error: 'Facebook publishing is not configured' };
     } catch (error) {
       return {
         success: false,
@@ -93,20 +72,17 @@ export class FacebookAdapter extends MarketplaceAdapter {
     }
   }
 
-  async updateListing(platformListingId: string, listing: Listing): Promise<PublishResult> {
-    console.log('Facebook: Updating listing:', platformListingId);
-    return { success: true, platformListingId };
+  async updateListing(platformListingId: string, _listing: Listing): Promise<PublishResult> {
+    return { success: false, error: `Facebook update is not configured for ${platformListingId}` };
   }
 
   async unpublishListing(platformListingId: string): Promise<PublishResult> {
-    console.log('Facebook: Unpublishing listing:', platformListingId);
-    return { success: true, platformListingId };
+    return { success: false, error: `Facebook unpublish is not configured for ${platformListingId}` };
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
-      console.log('Facebook: Validating credentials');
-      return true;
+      return false;
     } catch (error) {
       console.error('Facebook credential validation failed:', error);
       return false;
@@ -114,9 +90,6 @@ export class FacebookAdapter extends MarketplaceAdapter {
   }
 
   async getShopInfo(): Promise<Record<string, any>> {
-    return {
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error('Facebook shop lookup is not configured');
   }
 }

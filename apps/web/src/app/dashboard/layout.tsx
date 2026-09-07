@@ -15,41 +15,24 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Authentication is checked once when the dashboard mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     checkAuth();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
-        // In dev mode, create mock user
-        if (process.env.NEXT_PUBLIC_ENV === 'development') {
-          const mockUser = {
-            id: 'dev-user-' + Math.random().toString(36).substr(2, 9),
-            email: 'dev@listingko.local',
-          };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setUser(mockUser as any);
-        } else {
-          router.push('/');
-        }
+        router.push('/');
       } else {
         setUser(session.user);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      // In dev mode, allow access with mock user
-      if (process.env.NEXT_PUBLIC_ENV === 'development') {
-        const mockUser = {
-          id: 'dev-user-' + Math.random().toString(36).substr(2, 9),
-          email: 'dev@listingko.local',
-        };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setUser(mockUser as any);
-      } else {
-        router.push('/');
-      }
+      router.push('/');
     } finally {
       setLoading(false);
     }

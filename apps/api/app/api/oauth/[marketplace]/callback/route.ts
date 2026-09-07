@@ -1,9 +1,10 @@
 import { NextRequest } from 'next/server';
 import { ApiResponse } from '@listingko/shared-types';
 import { supabase } from '@/lib/database';
-import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
 import { MarketplaceAdapterFactory, MarketplaceCredentials } from '@/lib/marketplaces';
+import { encryptCredentials } from '@/lib/encryption';
+import { SUPPORTED_MARKETPLACES } from '@/lib/marketplaces/supported';
 
 export const runtime = 'nodejs';
 
@@ -44,20 +45,39 @@ export async function GET(request: NextRequest, { params }: { params: { marketpl
       );
     }
 
-    // TODO: Verify state to prevent CSRF attacks
-    // For now, we'll accept any state
+    if (!SUPPORTED_MARKETPLACES.includes(params.marketplace as (typeof SUPPORTED_MARKETPLACES)[number])) {
+      return corsResponse(
+        { success: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'Unsupported marketplace' } } as unknown as ApiResponse,
+        { status: 400 }
+      );
+    }
 
-    // Get user from state (would be encoded in real implementation)
-    const userId = '00000000-0000-0000-0000-000000000001'; // Dev mode user
+    const stateRecord = await supabase
+      .from('oauth_states')
+      .select('user_id, marketplace, expires_at')
+      .eq('state', state)
+      .eq('marketplace', params.marketplace)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+
+    if (stateRecord.error || !stateRecord.data) {
+      return corsResponse(
+        { success: false, data: null, error: { code: 'INVALID_STATE', message: 'OAuth state is invalid or expired' } } as unknown as ApiResponse,
+        { status: 400 }
+      );
+    }
+
+    const userId = stateRecord.data.user_id;
+    await supabase.from('oauth_states').delete().eq('state', state);
 
     // Create adapter for marketplace
-    const mockCredentials: MarketplaceCredentials = {
-      accessToken: `${params.marketplace}_token_${Date.now()}`,
+    const initialCredentials: MarketplaceCredentials = {
+      accessToken: '',
       shopId: 'temp_shop_id',
       shopName: 'Connected Shop',
     };
 
-    const adapter = MarketplaceAdapterFactory.createAdapter(params.marketplace, mockCredentials);
+    const adapter = MarketplaceAdapterFactory.createAdapter(params.marketplace, initialCredentials);
 
     // Exchange code for token with marketplace
     const credentials = await adapter.exchangeCodeForToken(code);
@@ -78,10 +98,8 @@ export async function GET(request: NextRequest, { params }: { params: { marketpl
       );
     }
 
-    // Get shop info
-    const shopInfo = await adapter.getShopInfo();
-
     // Update or create marketplace connection in database
+    const encryptedCredentials = encryptCredentials(credentials);
     const connection = await supabase
       .from('marketplace_connections')
       .upsert(
@@ -94,8 +112,8 @@ export async function GET(request: NextRequest, { params }: { params: { marketpl
           status: 'CONNECTED',
           shop_id: credentials.shopId,
           shop_name: credentials.shopName,
-          credentials_encrypted: JSON.stringify(credentials),
-          credentials_iv: 'placeholder_iv',
+          credentials_encrypted: encryptedCredentials.encrypted,
+          credentials_iv: `${encryptedCredentials.iv}:${encryptedCredentials.authTag}`,
         },
         { onConflict: 'user_id,marketplace' }
       )

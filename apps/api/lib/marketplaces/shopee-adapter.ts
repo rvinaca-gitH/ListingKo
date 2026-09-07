@@ -26,20 +26,11 @@ export class ShopeeAdapter extends MarketplaceAdapter {
   }
 
   async exchangeCodeForToken(code: string): Promise<MarketplaceCredentials> {
-    // TODO: Call Shopee API to exchange code for token
-    // For now, return mock implementation
-    console.log('Shopee: Exchanging code for token:', code);
-    return {
-      accessToken: `shopee_token_${Date.now()}`,
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error(`Shopee OAuth exchange is not configured for code ${code}`);
   }
 
   async refreshAccessToken(): Promise<MarketplaceCredentials> {
-    // TODO: Call Shopee API to refresh token
-    console.log('Shopee: Refreshing access token');
-    return this.credentials;
+    throw new Error('Shopee token refresh is not configured');
   }
 
   async validateListing(listing: Listing): Promise<{ valid: boolean; errors?: string[] }> {
@@ -76,25 +67,7 @@ export class ShopeeAdapter extends MarketplaceAdapter {
     }
 
     try {
-      // TODO: Call Shopee API to publish listing
-      // This is a mock implementation
-      const platformListingId = `shopee_${Date.now()}`;
-
-      console.log('Shopee: Publishing listing:', {
-        listingId: listing.id,
-        title: listing.title,
-        platformListingId,
-      });
-
-      return {
-        success: true,
-        platformListingId,
-        details: {
-          marketplace: 'shopee',
-          publishedAt: new Date().toISOString(),
-          shopId: this.credentials.shopId,
-        },
-      };
+      return { success: false, error: 'Shopee publishing is not configured' };
     } catch (error) {
       return {
         success: false,
@@ -103,29 +76,17 @@ export class ShopeeAdapter extends MarketplaceAdapter {
     }
   }
 
-  async updateListing(platformListingId: string, listing: Listing): Promise<PublishResult> {
-    // TODO: Implement Shopee API call to update listing
-    console.log('Shopee: Updating listing:', platformListingId);
-    return {
-      success: true,
-      platformListingId,
-    };
+  async updateListing(platformListingId: string, _listing: Listing): Promise<PublishResult> {
+    return { success: false, error: `Shopee update is not configured for ${platformListingId}` };
   }
 
   async unpublishListing(platformListingId: string): Promise<PublishResult> {
-    // TODO: Implement Shopee API call to delete listing
-    console.log('Shopee: Unpublishing listing:', platformListingId);
-    return {
-      success: true,
-      platformListingId,
-    };
+    return { success: false, error: `Shopee unpublish is not configured for ${platformListingId}` };
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
-      // TODO: Call Shopee API to validate token
-      console.log('Shopee: Validating credentials');
-      return true;
+      return false;
     } catch (error) {
       console.error('Shopee credential validation failed:', error);
       return false;
@@ -133,10 +94,6 @@ export class ShopeeAdapter extends MarketplaceAdapter {
   }
 
   async getShopInfo(): Promise<Record<string, any>> {
-    // TODO: Call Shopee API to get shop info
-    return {
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error('Shopee shop lookup is not configured');
   }
 }

@@ -104,7 +104,7 @@ export default function ExportView({ productId }: ExportViewProps) {
         </div>
 
         <div className="border-t border-gray-200 pt-6">
-          <h3 className="font-semibold text-gray-900 mb-3">What's Included</h3>
+          <h3 className="font-semibold text-gray-900 mb-3">What&apos;s Included</h3>
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-center gap-2">
               <span>✓</span> Product Master analysis

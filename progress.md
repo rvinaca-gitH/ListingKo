@@ -2,6 +2,23 @@
 
 > Tracks development stages, completed work, and blockers.
 
+## Current Audit Status — 2026-09-07
+
+Implemented and validated at source level:
+
+- Monorepo, API, web, mobile, shared packages, and Supabase migration structure.
+- Product, listing, QA, export, marketplace-connection, and image route surfaces.
+- Web product-master, listings, and image panels connected to existing API responses.
+- Supabase bearer-token verification, OAuth state persistence/expiry checks, and credential encryption for new connections.
+- Stability AI image-generation request path with Supabase Storage persistence.
+
+Still incomplete or environment-dependent:
+
+- Marketplace OAuth token exchange, credential validation, publishing, updating, and deletion require provider API implementations and credentials.
+- Automated unit, integration, and E2E tests are not present.
+- Production build/type-check requires a working pnpm/Turbo environment and has not completed in this workspace.
+- Rate limiting, monitoring, analytics, subscriptions, and mobile feature screens remain outstanding.
+
 ---
 
 ## Phase 1: Foundation (🟢 Complete)
@@ -196,7 +213,10 @@
 
 ## Current Blockers
 
-None yet — ready to scaffold!
+- Marketplace provider OAuth and publishing adapters still require real provider credentials and API implementations.
+- Automated unit, integration, and E2E tests have not been added.
+- Root Turbo build currently fails during package-manager discovery; direct web and API builds pass.
+- Mobile package type-check passes, but Expo peer-dependency warnings remain and device testing is still outstanding.
 
 ---
 
@@ -247,4 +267,3 @@ Marketplace connection rate (V2)
 7. Start with Phase 2 tasks assigned to you
 
 ---
-

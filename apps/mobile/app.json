@@ -5,27 +5,14 @@
     "version": "0.1.0",
     "sdkVersion": "57.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "listingko",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTabletMode": true,
       "bundleIdentifier": "com.listingko.app"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "package": "com.listingko.app"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "plugins": []
   }

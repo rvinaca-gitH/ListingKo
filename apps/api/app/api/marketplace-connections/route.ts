@@ -3,6 +3,7 @@ import { ApiResponse } from '@listingko/shared-types';
 import { supabase } from '@/lib/database';
 import { getAuthUser } from '@/lib/auth';
 import { corsResponse } from '@/lib/cors';
+import { encryptCredentials } from '@/lib/encryption';
 
 export const runtime = 'nodejs';
 
@@ -130,18 +131,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Encrypt credentials before storing
-    // For now, use placeholder encryption (in production, use actual encryption)
-    const credentialsEncrypted = JSON.stringify(body.credentials || {});
-    const credentialsIv = 'placeholder-iv'; // TODO: Generate proper IV
+    const encryptedCredentials = encryptCredentials(body.credentials || {});
 
     const result = await supabase
       .from('marketplace_connections')
       .insert({
         user_id: userId,
         marketplace: body.marketplace,
-        credentials_encrypted: credentialsEncrypted,
-        credentials_iv: credentialsIv,
+        credentials_encrypted: encryptedCredentials.encrypted,
+        credentials_iv: `${encryptedCredentials.iv}:${encryptedCredentials.authTag}`,
         status: 'CONNECTED',
         shop_id: body.shopId,
         shop_name: body.shopName,

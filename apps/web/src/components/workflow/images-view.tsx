@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { apiClient } from '@/lib/api-client';
 
 interface ImagesViewProps {
   productId: string;
@@ -22,9 +23,7 @@ export default function ImagesView({ productId, onRefresh }: ImagesViewProps) {
 
     try {
       setUploading(true);
-      // Upload logic will be implemented in Phase 4
-      console.log('Uploading file:', files[0].name);
-      // TODO: Upload to /api/images
+      await apiClient.uploadImage(productId, files[0]);
       onRefresh();
     } catch (err) {
       console.error('Upload failed:', err);
@@ -36,9 +35,7 @@ export default function ImagesView({ productId, onRefresh }: ImagesViewProps) {
   const handleGenerateImages = async () => {
     try {
       setGenerating(true);
-      // Image generation logic will be implemented in Phase 4
-      console.log('Generating images for product:', productId);
-      // TODO: Call /api/images/generate
+      await apiClient.generateImages(productId);
       onRefresh();
     } catch (err) {
       console.error('Generation failed:', err);

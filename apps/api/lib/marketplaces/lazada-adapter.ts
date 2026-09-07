@@ -26,17 +26,11 @@ export class LazadaAdapter extends MarketplaceAdapter {
   }
 
   async exchangeCodeForToken(code: string): Promise<MarketplaceCredentials> {
-    console.log('Lazada: Exchanging code for token:', code);
-    return {
-      accessToken: `lazada_token_${Date.now()}`,
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error(`Lazada OAuth exchange is not configured for code ${code}`);
   }
 
   async refreshAccessToken(): Promise<MarketplaceCredentials> {
-    console.log('Lazada: Refreshing access token');
-    return this.credentials;
+    throw new Error('Lazada token refresh is not configured');
   }
 
   async validateListing(listing: Listing): Promise<{ valid: boolean; errors?: string[] }> {
@@ -68,22 +62,7 @@ export class LazadaAdapter extends MarketplaceAdapter {
     }
 
     try {
-      const platformListingId = `lazada_${Date.now()}`;
-      console.log('Lazada: Publishing listing:', {
-        listingId: listing.id,
-        title: listing.title,
-        platformListingId,
-      });
-
-      return {
-        success: true,
-        platformListingId,
-        details: {
-          marketplace: 'lazada',
-          publishedAt: new Date().toISOString(),
-          shopId: this.credentials.shopId,
-        },
-      };
+      return { success: false, error: 'Lazada publishing is not configured' };
     } catch (error) {
       return {
         success: false,
@@ -92,20 +71,17 @@ export class LazadaAdapter extends MarketplaceAdapter {
     }
   }
 
-  async updateListing(platformListingId: string, listing: Listing): Promise<PublishResult> {
-    console.log('Lazada: Updating listing:', platformListingId);
-    return { success: true, platformListingId };
+  async updateListing(platformListingId: string, _listing: Listing): Promise<PublishResult> {
+    return { success: false, error: `Lazada update is not configured for ${platformListingId}` };
   }
 
   async unpublishListing(platformListingId: string): Promise<PublishResult> {
-    console.log('Lazada: Unpublishing listing:', platformListingId);
-    return { success: true, platformListingId };
+    return { success: false, error: `Lazada unpublish is not configured for ${platformListingId}` };
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
-      console.log('Lazada: Validating credentials');
-      return true;
+      return false;
     } catch (error) {
       console.error('Lazada credential validation failed:', error);
       return false;
@@ -113,9 +89,6 @@ export class LazadaAdapter extends MarketplaceAdapter {
   }
 
   async getShopInfo(): Promise<Record<string, any>> {
-    return {
-      shopId: this.credentials.shopId,
-      shopName: this.credentials.shopName,
-    };
+    throw new Error('Lazada shop lookup is not configured');
   }
 }
