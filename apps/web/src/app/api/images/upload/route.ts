@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${productId}/${Date.now()}-${file.name}`;
     const fileBuffer = await file.arrayBuffer();
 
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { error: uploadError } = await supabaseAdmin.storage
       .from('product-images')
       .upload(fileName, new Uint8Array(fileBuffer), {
         cacheControl: '3600',

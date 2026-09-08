@@ -59,7 +59,6 @@ export async function POST(request: NextRequest) {
 
       // Insert listing directly (service role key bypasses RLS on local dev)
       try {
-        console.log(`Creating listing for ${platform}...`);
         const { data: savedListing, error: insertError } = await supabaseAdmin
           .from('listings')
           .insert([listing])
@@ -67,16 +66,11 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (insertError) {
-          console.error(`Error creating ${platform} listing:`, insertError);
           throw insertError;
         } else if (savedListing) {
-          console.log(`Successfully created ${platform} listing`);
           createdListings.push(savedListing);
-        } else {
-          console.warn(`No data returned for ${platform} listing`);
         }
       } catch (err) {
-        console.error(`Exception creating ${platform} listing:`, err);
         throw err;
       }
     }
@@ -91,9 +85,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('POST /api/listings error:', error);
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-    console.error('Final error:', errorMessage);
     return NextResponse.json(
       {
         success: false,
@@ -106,7 +98,6 @@ export async function POST(request: NextRequest) {
 
 function generateListingForPlatform(platform: string, product: any, productMaster: any) {
   const baseTitle = productMaster.name || product.title;
-  const baseDescription = productMaster.description || product.description || '';
 
   const platformConfigs: Record<string, any> = {
     shopee: {
