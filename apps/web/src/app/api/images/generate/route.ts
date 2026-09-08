@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
                 url_large: urlData.publicUrl,
                 type: 'AI_GENERATED',
                 ai_prompt: prompts[i],
-                ai_model: isDevelopment && imageBuffer ? 'demo-placeholder' : model,
+                ai_model: model,
                 ai_version: '1.0',
                 mime_type: 'image/jpeg',
                 size_bytes: imageBuffer.length,
