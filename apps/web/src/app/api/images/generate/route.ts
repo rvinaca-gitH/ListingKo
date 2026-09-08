@@ -106,42 +106,36 @@ export async function POST(request: NextRequest) {
 
           let imageBuffer: Buffer | null = null;
 
-          try {
-            const response = await fetch(
-              `https://api-inference.huggingface.co/models/${model}`,
-              {
-                method: 'POST',
-                headers: {
-                  Authorization: `Bearer ${hfApiKey}`,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  inputs: prompts[i],
-                }),
-                signal: controller.signal,
-              }
-            );
-
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-              const errorData = await response.text();
-              throw new Error(`${model}: ${response.status} ${errorData}`);
+          const response = await fetch(
+            `https://api-inference.huggingface.co/models/${model}`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${hfApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                inputs: prompts[i],
+              }),
+              signal: controller.signal,
             }
+          );
 
-            imageBuffer = await response.buffer();
-            console.log(`Successfully generated image with ${model}, size: ${imageBuffer.length} bytes`);
-          } catch (fetchErr) {
-            // Network not available
-            throw fetchErr;
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`${model}: ${response.status} ${errorData}`);
           }
+
+          imageBuffer = await response.buffer();
 
           if (!imageBuffer) continue;
 
           // Upload to Supabase Storage
           const fileName = `${productId}/${Date.now()}-generated-${i}.jpg`;
 
-          const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+          const { error: uploadError } = await supabaseAdmin.storage
             .from('product-images')
             .upload(fileName, imageBuffer, {
               cacheControl: '3600',
