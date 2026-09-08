@@ -73,9 +73,18 @@ export default function ImagesView({ productId }: ImagesViewProps) {
     try {
       setGenerating(true);
       setError(null);
-      console.log('Generating images for product:', productId);
+      console.log('Starting image generation for product:', productId);
       const result = await apiClient.generateImages(productId);
-      console.log('Generation successful:', result);
+      console.log('Generation API response:', result);
+
+      if (!result || result.length === 0) {
+        console.warn('Generation returned no images');
+        setError('Image generation completed but no images were produced. Please check the server logs.');
+        setGenerating(false);
+        return;
+      }
+
+      console.log(`Successfully generated ${result.length} images`);
       await loadImages();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Generation failed';

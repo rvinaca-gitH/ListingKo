@@ -65,8 +65,10 @@ export async function POST(request: NextRequest) {
 
     // Generate images using Hugging Face Inference API (free)
     const hfApiKey = process.env.HUGGING_FACE_API_KEY;
+    console.log('HUGGING_FACE_API_KEY configured:', !!hfApiKey);
+
     if (!hfApiKey) {
-      console.warn('HUGGING_FACE_API_KEY not configured');
+      console.error('HUGGING_FACE_API_KEY not configured');
       return NextResponse.json(
         {
           success: false,
@@ -96,6 +98,11 @@ export async function POST(request: NextRequest) {
       // Try different models until one succeeds
       for (const model of models) {
         try {
+          console.log(`Attempting to generate image ${i + 1}/3 with model: ${model}`);
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
           const response = await fetch(
             `https://api-inference.huggingface.co/models/${model}`,
             {
@@ -107,8 +114,11 @@ export async function POST(request: NextRequest) {
               body: JSON.stringify({
                 inputs: prompts[i],
               }),
+              signal: controller.signal,
             }
           );
+
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
             const errorData = await response.text();
@@ -118,6 +128,7 @@ export async function POST(request: NextRequest) {
           }
 
           const imageBuffer = await response.buffer();
+          console.log(`Successfully generated image with ${model}, size: ${imageBuffer.length} bytes`);
 
           // Upload to Supabase Storage
           const fileName = `${productId}/${Date.now()}-generated-${i}.jpg`;
@@ -176,6 +187,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log(`Image generation complete. Generated ${generatedImages.length} images`);
+
+    if (generatedImages.length === 0) {
+      console.warn('No images were successfully generated');
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -184,10 +201,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('POST /api/images/generate error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', { errorMessage });
     return NextResponse.json(
       {
         success: false,
-        error: { message: error instanceof Error ? error.message : 'Unknown error' },
+        error: { message: errorMessage },
       },
       { status: 500 }
     );
