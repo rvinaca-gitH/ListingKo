@@ -63,56 +63,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate images using Stability AI
-    const apiKey = process.env.STABILITY_API_KEY;
-    if (!apiKey) {
-      console.warn('STABILITY_API_KEY not configured');
+    // Generate images using Hugging Face Inference API (free)
+    const hfApiKey = process.env.HUGGING_FACE_API_KEY;
+    if (!hfApiKey) {
+      console.warn('HUGGING_FACE_API_KEY not configured');
       return NextResponse.json(
         {
           success: false,
-          error: { message: 'Image generation not configured. Please set STABILITY_API_KEY.' },
+          error: { message: 'Image generation not configured. Please set HUGGING_FACE_API_KEY. Get free key at https://huggingface.co/settings/tokens' },
         },
         { status: 500 }
       );
     }
 
     const prompts = [
-      `Professional product photo of ${productMaster.name}. Product photography, studio lighting, white background, high quality, 8k`,
-      `Lifestyle photo showing ${productMaster.name} in use. Lifestyle photography, realistic setting`,
-      `Hero product image for ecommerce: ${productMaster.name}. Marketing photography, professional, clean background`,
+      `Professional product photo of ${productMaster.name}. Product photography, studio lighting, white background, high quality, professional`,
+      `Lifestyle photo showing ${productMaster.name} in use. Lifestyle photography, realistic setting, modern aesthetic`,
+      `Hero product image for ecommerce: ${productMaster.name}. Marketing photography, professional, clean background, product focused`,
     ];
 
     const generatedImages = [];
+    const models = [
+      'black-forest-labs/FLUX.1-dev',
+      'stabilityai/stable-diffusion-2-1',
+      'runwayml/stable-diffusion-v1-5',
+    ];
 
     for (let i = 0; i < prompts.length; i++) {
-      try {
-        const response = await fetch('https://api.stability.ai/v1/generation/stable-diffusion-3-5-large/text-to-image', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: prompts[i],
-            negative_prompt: 'blurry, low quality, distorted, ugly',
-            aspect_ratio: '1:1',
-            output_format: 'jpeg',
-          }),
-        });
+      let generated = false;
+      let lastError: Error | null = null;
 
-        if (!response.ok) {
-          const errorData = await response.text();
-          console.error(`Image generation failed: ${response.status} ${errorData}`);
-          continue;
-        }
+      // Try different models until one succeeds
+      for (const model of models) {
+        try {
+          const response = await fetch(
+            `https://api-inference.huggingface.co/models/${model}`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${hfApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                inputs: prompts[i],
+              }),
+            }
+          );
 
-        const data = await response.json() as any;
-        if (data.artifacts && data.artifacts[0]) {
-          const imageBase64 = data.artifacts[0].base64;
+          if (!response.ok) {
+            const errorData = await response.text();
+            lastError = new Error(`${model}: ${response.status} ${errorData}`);
+            console.warn(`Model ${model} failed:`, lastError.message);
+            continue;
+          }
+
+          const imageBuffer = await response.buffer();
 
           // Upload to Supabase Storage
           const fileName = `${productId}/${Date.now()}-generated-${i}.jpg`;
-          const imageBuffer = Buffer.from(imageBase64, 'base64');
 
           const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
             .from('product-images')
@@ -143,7 +151,7 @@ export async function POST(request: NextRequest) {
                 url_large: urlData.publicUrl,
                 type: 'AI_GENERATED',
                 ai_prompt: prompts[i],
-                ai_model: 'stable-diffusion-3-5-large',
+                ai_model: model,
                 ai_version: '1.0',
                 mime_type: 'image/jpeg',
                 size_bytes: imageBuffer.length,
@@ -154,10 +162,17 @@ export async function POST(request: NextRequest) {
 
           if (imageData) {
             generatedImages.push(imageData);
+            generated = true;
+            break;
           }
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error(String(err));
+          console.error(`Error with model ${model}:`, lastError);
         }
-      } catch (err) {
-        console.error(`Error generating image ${i}:`, err);
+      }
+
+      if (!generated && lastError) {
+        console.error(`Failed to generate image ${i} with all models:`, lastError.message);
       }
     }
 
