@@ -152,7 +152,10 @@ export default function ProductsPage() {
       </div>
 
       {/* Products List */}
-      {products.length > 0 && (
+      {loading && (
+        <div className="text-center text-gray-500 py-8">Loading your products...</div>
+      )}
+      {!loading && products.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Your Products</h2>
           <div className="space-y-3">

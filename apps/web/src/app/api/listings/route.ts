@@ -58,20 +58,16 @@ export async function POST(request: NextRequest) {
       );
 
       // Insert listing directly (service role key bypasses RLS on local dev)
-      try {
-        const { data: savedListing, error: insertError } = await supabaseAdmin
-          .from('listings')
-          .insert([listing])
-          .select()
-          .single();
+      const { data: savedListing, error: insertError } = await supabaseAdmin
+        .from('listings')
+        .insert([listing])
+        .select()
+        .single();
 
-        if (insertError) {
-          throw insertError;
-        } else if (savedListing) {
-          createdListings.push(savedListing);
-        }
-      } catch (err) {
-        throw err;
+      if (insertError) {
+        throw insertError;
+      } else if (savedListing) {
+        createdListings.push(savedListing);
       }
     }
 

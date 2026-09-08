@@ -16,7 +16,7 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -31,13 +31,6 @@ export async function POST(
 
     if (productError) throw productError;
     if (!product) throw new Error('Product not found');
-
-    // Check if product master already exists
-    const { data: existingMaster } = await supabaseAdmin
-      .from('product_masters')
-      .select('*')
-      .eq('product_id', productId)
-      .single();
 
     // For development, create a mock product master analysis
     // In production, this would call Claude AI or another AI service

@@ -101,8 +101,6 @@ export async function POST(request: NextRequest) {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
-          let imageBuffer: Buffer | null = null;
-
           const response = await fetch(
             `https://api-inference.huggingface.co/models/${model}`,
             {
@@ -125,9 +123,10 @@ export async function POST(request: NextRequest) {
             throw new Error(`${model}: ${response.status} ${errorData}`);
           }
 
-          imageBuffer = await response.buffer();
+          const arrayBuffer = await response.arrayBuffer();
+          const imageBuffer = Buffer.from(arrayBuffer);
 
-          if (!imageBuffer) continue;
+          if (!imageBuffer || imageBuffer.length === 0) continue;
 
           // Upload to Supabase Storage
           const fileName = `${productId}/${Date.now()}-generated-${i}.jpg`;
