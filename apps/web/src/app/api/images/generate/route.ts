@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
     // Generate images using Stability AI
     const apiKey = process.env.STABILITY_API_KEY;
     if (!apiKey) {
-      console.warn('STABILITY_API_KEY not configured, skipping image generation');
-      return NextResponse.json({
-        success: true,
-        data: {
-          images: [],
-          message: 'Image generation skipped - API key not configured',
+      console.warn('STABILITY_API_KEY not configured');
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: 'Image generation not configured. Please set STABILITY_API_KEY.' },
         },
-      });
+        { status: 500 }
+      );
     }
 
     const prompts = [

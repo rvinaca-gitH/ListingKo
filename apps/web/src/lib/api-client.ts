@@ -221,11 +221,12 @@ export class ApiClient {
       body: formData,
     });
 
+    const data = (await response.json()) as any;
+
     if (!response.ok) {
-      throw new Error('Upload failed');
+      throw new Error(data.error?.message || 'Upload failed');
     }
 
-    const data = (await response.json()) as any;
     return data.data;
   }
 

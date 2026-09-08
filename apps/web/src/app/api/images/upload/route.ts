@@ -93,12 +93,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('POST /api/images/upload error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const status = error instanceof Error && error.message.includes('Product not found') ? 404 : 500;
     return NextResponse.json(
       {
         success: false,
-        error: { message: error instanceof Error ? error.message : 'Unknown error' },
+        error: { message: errorMessage },
       },
-      { status: 500 }
+      { status }
     );
   }
 }
