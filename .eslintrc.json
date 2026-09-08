@@ -40,6 +40,14 @@
       "rules": {
         "no-console": "off"
       }
+    },
+    {
+      "files": [
+        "apps/web/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
     }
   ]
 }
