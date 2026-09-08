@@ -65,26 +65,18 @@ export async function POST(request: NextRequest) {
 
     // Generate images using Hugging Face Inference API (free)
     const hfApiKey = process.env.HUGGING_FACE_API_KEY;
-    const isDevelopment = process.env.NEXT_PUBLIC_ENV === 'development';
 
     console.log('HUGGING_FACE_API_KEY configured:', !!hfApiKey);
-    console.log('Environment:', process.env.NEXT_PUBLIC_ENV);
 
     if (!hfApiKey) {
       console.error('HUGGING_FACE_API_KEY not configured');
       return NextResponse.json(
         {
           success: false,
-          error: { message: 'Image generation not configured. Please set HUGGING_FACE_API_KEY. Get free key at https://huggingface.co/settings/tokens' },
+          error: { message: 'AI image generation requires HUGGING_FACE_API_KEY. Create a free account at https://huggingface.co and get an API token from https://huggingface.co/settings/tokens' },
         },
         { status: 500 }
       );
-    }
-
-    // Use demo mode if network is unavailable (development environment)
-    const useDemoMode = isDevelopment && process.env.USE_DEMO_IMAGES === 'true';
-    if (useDemoMode) {
-      console.log('Using demo mode for image generation');
     }
 
     const prompts = [
@@ -140,15 +132,8 @@ export async function POST(request: NextRequest) {
             imageBuffer = await response.buffer();
             console.log(`Successfully generated image with ${model}, size: ${imageBuffer.length} bytes`);
           } catch (fetchErr) {
-            // Network error - create demo placeholder
-            if (isDevelopment) {
-              console.warn(`Network error: ${fetchErr}. Using demo placeholder for development.`);
-              // Create a 100x100 gradient PNG placeholder (much more visible)
-              const pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAA7UlEQVR4nO3QMQEAAAjDsM9xb/gHVvDADRMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAgXkH5IoEkrR0qwIAAAAASUVORK5CYII=';
-              imageBuffer = Buffer.from(pngBase64, 'base64');
-            } else {
-              throw fetchErr;
-            }
+            // Network not available
+            throw fetchErr;
           }
 
           if (!imageBuffer) continue;
