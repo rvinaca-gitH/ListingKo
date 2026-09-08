@@ -66,10 +66,8 @@ export async function POST(request: NextRequest) {
     // Generate images using Hugging Face Inference API (free)
     const hfApiKey = process.env.HUGGING_FACE_API_KEY;
 
-    console.log('HUGGING_FACE_API_KEY configured:', !!hfApiKey);
 
     if (!hfApiKey) {
-      console.error('HUGGING_FACE_API_KEY not configured');
       return NextResponse.json(
         {
           success: false,
@@ -99,7 +97,6 @@ export async function POST(request: NextRequest) {
       // Try different models until one succeeds
       for (const model of models) {
         try {
-          console.log(`Attempting to generate image ${i + 1}/3 with model: ${model}`);
 
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
