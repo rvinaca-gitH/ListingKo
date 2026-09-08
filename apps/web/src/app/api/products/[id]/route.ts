@@ -69,7 +69,7 @@ export async function PATCH(
   try {
     const body = await request.json();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .update(body)
       .eq('id', params.id)
