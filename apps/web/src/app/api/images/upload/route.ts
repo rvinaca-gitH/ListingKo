@@ -73,9 +73,13 @@ export async function POST(request: NextRequest) {
         {
           product_id: productId,
           user_id: DEV_USER_ID,
-          image_url: data.publicUrl,
-          storage_path: uploadData.path,
-          image_type: 'uploaded',
+          url_original: data.publicUrl,
+          url_medium: data.publicUrl,
+          url_large: data.publicUrl,
+          type: 'USER_UPLOAD',
+          original_filename: file.name,
+          size_bytes: file.size,
+          mime_type: file.type,
         },
       ])
       .select()

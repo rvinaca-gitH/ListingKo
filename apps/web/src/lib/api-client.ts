@@ -197,6 +197,13 @@ export class ApiClient {
   }
 
   // Images
+  static async getImages(productId: string): Promise<any[]> {
+    const response = await this.fetch<any>(`/api/images?productId=${productId}`, {
+      method: 'GET',
+    });
+    return response.data?.images || [];
+  }
+
   static async uploadImage(productId: string, file: File): Promise<any> {
     const token = await this.getAuthToken();
     const headers: Record<string, string> = {};
@@ -254,6 +261,7 @@ const apiClient = {
   publishListing: ApiClient.publishListing.bind(ApiClient),
   getOAuthUrl: ApiClient.getOAuthUrl.bind(ApiClient),
   startOAuth: ApiClient.startOAuth.bind(ApiClient),
+  getImages: ApiClient.getImages.bind(ApiClient),
   uploadImage: ApiClient.uploadImage.bind(ApiClient),
   generateImages: ApiClient.generateImages.bind(ApiClient),
   deleteImage: ApiClient.deleteImage.bind(ApiClient),

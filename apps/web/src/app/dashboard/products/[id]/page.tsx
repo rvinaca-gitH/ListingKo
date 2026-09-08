@@ -137,7 +137,7 @@ export default function ProductPage() {
           <ListingsView productId={productId} onRefresh={handleRefresh} />
         )}
         {activeTab === 'images' && (
-          <ImagesView productId={productId} onRefresh={handleRefresh} />
+          <ImagesView productId={productId} />
         )}
         {activeTab === 'qa' && (
           <QAResultsView productId={productId} onRefresh={handleRefresh} />

@@ -138,10 +138,15 @@ export async function POST(request: NextRequest) {
               {
                 product_id: productId,
                 user_id: DEV_USER_ID,
-                image_url: urlData.publicUrl,
-                storage_path: uploadData.path,
-                image_type: 'generated',
-                prompt: prompts[i],
+                url_original: urlData.publicUrl,
+                url_medium: urlData.publicUrl,
+                url_large: urlData.publicUrl,
+                type: 'AI_GENERATED',
+                ai_prompt: prompts[i],
+                ai_model: 'stable-diffusion-3-5-large',
+                ai_version: '1.0',
+                mime_type: 'image/jpeg',
+                size_bytes: imageBuffer.length,
               },
             ])
             .select()
