@@ -53,14 +53,16 @@ export default function ImagesView({ productId }: ImagesViewProps) {
     try {
       setUploading(true);
       setError(null);
-      await apiClient.uploadImage(productId, files[0]);
+      console.log('Uploading image for product:', productId);
+      const result = await apiClient.uploadImage(productId, files[0]);
+      console.log('Upload successful:', result);
       await loadImages();
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Upload failed';
-      console.error('Upload failed:', err);
+      console.error('Upload failed:', err, { productId, fileName: files[0]?.name });
       setError(message);
     } finally {
       setUploading(false);
@@ -71,11 +73,13 @@ export default function ImagesView({ productId }: ImagesViewProps) {
     try {
       setGenerating(true);
       setError(null);
-      await apiClient.generateImages(productId);
+      console.log('Generating images for product:', productId);
+      const result = await apiClient.generateImages(productId);
+      console.log('Generation successful:', result);
       await loadImages();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Generation failed';
-      console.error('Generation failed:', err);
+      console.error('Generation failed:', err, { productId });
       setError(message);
     } finally {
       setGenerating(false);
