@@ -140,11 +140,11 @@ export async function POST(request: NextRequest) {
             imageBuffer = await response.buffer();
             console.log(`Successfully generated image with ${model}, size: ${imageBuffer.length} bytes`);
           } catch (fetchErr) {
-            // Network error - create demo placeholder (1x1 blue PNG)
+            // Network error - create demo placeholder
             if (isDevelopment) {
               console.warn(`Network error: ${fetchErr}. Using demo placeholder for development.`);
-              // Create minimal valid PNG (1x1 blue pixel) - works reliably
-              const pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+              // Create a 100x100 gradient PNG placeholder (much more visible)
+              const pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAA7UlEQVR4nO3QMQEAAAjDsM9xb/gHVvDADRMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAgXkH5IoEkrR0qwIAAAAASUVORK5CYII=';
               imageBuffer = Buffer.from(pngBase64, 'base64');
             } else {
               throw fetchErr;
