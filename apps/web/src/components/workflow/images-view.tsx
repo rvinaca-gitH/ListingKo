@@ -69,7 +69,13 @@ export default function ImagesView({ productId }: ImagesViewProps) {
     }
   };
 
+  const hasOriginalPhoto = images.some((image) => image.type === 'USER_UPLOAD');
+
   const handleGenerateImages = async () => {
+    if (!hasOriginalPhoto) {
+      setError('Please upload your original product photo before generating AI images.');
+      return;
+    }
     try {
       setGenerating(true);
       setError(null);
@@ -132,16 +138,18 @@ export default function ImagesView({ productId }: ImagesViewProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer">
             <div className="text-3xl mb-3">📤</div>
-            <h3 className="font-medium text-gray-900 mb-2">Upload Photos</h3>
+            <h3 className="font-medium text-gray-900 mb-2">
+              Upload Original Product Photo <span className="text-red-500">*</span>
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Your product photos help AI create accurate descriptions
+              Required before generating AI images
             </p>
             <button
               onClick={handleUploadClick}
               disabled={uploading}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium transition disabled:opacity-50"
             >
-              {uploading ? 'Uploading...' : 'Upload Image'}
+              {uploading ? 'Uploading...' : 'Upload Original Product Photo or Image'}
             </button>
             <input
               ref={fileInputRef}
@@ -150,18 +158,29 @@ export default function ImagesView({ productId }: ImagesViewProps) {
               onChange={handleFileChange}
               className="hidden"
             />
+            {hasOriginalPhoto && (
+              <p className="text-xs text-green-700 mt-2">✓ Original photo uploaded</p>
+            )}
           </div>
 
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer">
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
+              hasOriginalPhoto
+                ? 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
+                : 'border-gray-200 bg-gray-50 opacity-60'
+            }`}
+          >
             <div className="text-3xl mb-3">✨</div>
             <h3 className="font-medium text-gray-900 mb-2">Generate with AI</h3>
             <p className="text-sm text-gray-600 mb-4">
-              Create hero, lifestyle, and lifestyle images automatically
+              {hasOriginalPhoto
+                ? 'Create hero, lifestyle, and display images automatically'
+                : 'Upload your original product photo first'}
             </p>
             <button
               onClick={handleGenerateImages}
-              disabled={generating}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition disabled:opacity-50"
+              disabled={generating || !hasOriginalPhoto}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating ? 'Generating...' : 'Generate Images'}
             </button>

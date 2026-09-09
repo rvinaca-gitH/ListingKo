@@ -63,6 +63,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { data: originalPhoto } = await supabaseAdmin
+      .from('images')
+      .select('id')
+      .eq('product_id', productId)
+      .eq('type', 'USER_UPLOAD')
+      .limit(1)
+      .maybeSingle();
+
+    if (!originalPhoto) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: 'Please upload your original product photo before generating AI images.' },
+        },
+        { status: 400 }
+      );
+    }
+
     // Generate images using Hugging Face Inference API (free)
     const hfApiKey = process.env.HUGGING_FACE_API_KEY;
 
