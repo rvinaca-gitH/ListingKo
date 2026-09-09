@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { scoreListing, repairListing, QAProductMaster } from '@/lib/qa-engine';
 
 const DEV_USER_ID = 'a1111111-1111-1111-1111-111111111111';
 
@@ -67,7 +68,8 @@ export async function POST(request: NextRequest) {
       if (insertError) {
         throw insertError;
       } else if (savedListing) {
-        createdListings.push(savedListing);
+        const finalListing = await runQAAndRepair(savedListing, productMaster);
+        createdListings.push(finalListing);
       }
     }
 
@@ -90,6 +92,107 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function runQAAndRepair(listing: any, productMaster: any) {
+  const master: QAProductMaster = {
+    name: productMaster.name,
+    description: productMaster.description,
+    category: productMaster.category,
+    strengths: productMaster.strengths || [],
+    keywords: productMaster.keywords || [],
+    specifications: productMaster.specifications,
+    unsupported_claims: productMaster.unsupported_claims,
+  };
+
+  const firstPass = scoreListing(
+    { platform: listing.platform, title: listing.title, description: listing.description },
+    master
+  );
+
+  const { data: firstQAResult } = await supabaseAdmin
+    .from('qa_results')
+    .insert([
+      {
+        listing_id: listing.id,
+        user_id: DEV_USER_ID,
+        fact_accuracy: firstPass.fact_accuracy,
+        seo_quality: firstPass.seo_quality,
+        platform_fit: firstPass.platform_fit,
+        readability: firstPass.readability,
+        claim_safety: firstPass.claim_safety,
+        total_score: firstPass.total_score,
+        passed: firstPass.passed,
+        issues: firstPass.issues,
+        attempted_repair: !firstPass.passed,
+      },
+    ])
+    .select()
+    .single();
+
+  if (firstPass.passed) {
+    const { data: updatedListing } = await supabaseAdmin
+      .from('listings')
+      .update({
+        qa_result_id: firstQAResult?.id,
+        qa_passed: true,
+        qa_score: firstPass.total_score,
+        status: 'QA_PASSED',
+      })
+      .eq('id', listing.id)
+      .select()
+      .single();
+    return updatedListing || listing;
+  }
+
+  // Failed - attempt one grounded auto-repair pass, then re-score.
+  const repaired = repairListing(
+    { platform: listing.platform, title: listing.title, description: listing.description },
+    master,
+    firstPass.issues
+  );
+  const secondPass = scoreListing(repaired, master);
+
+  const { data: secondQAResult } = await supabaseAdmin
+    .from('qa_results')
+    .insert([
+      {
+        listing_id: listing.id,
+        user_id: DEV_USER_ID,
+        fact_accuracy: secondPass.fact_accuracy,
+        seo_quality: secondPass.seo_quality,
+        platform_fit: secondPass.platform_fit,
+        readability: secondPass.readability,
+        claim_safety: secondPass.claim_safety,
+        total_score: secondPass.total_score,
+        passed: secondPass.passed,
+        issues: secondPass.issues,
+        attempted_repair: false,
+      },
+    ])
+    .select()
+    .single();
+
+  await supabaseAdmin
+    .from('qa_results')
+    .update({ repair_success: secondPass.passed })
+    .eq('id', firstQAResult?.id);
+
+  const { data: updatedListing } = await supabaseAdmin
+    .from('listings')
+    .update({
+      title: repaired.title,
+      description: repaired.description,
+      qa_result_id: secondQAResult?.id,
+      qa_passed: secondPass.passed,
+      qa_score: secondPass.total_score,
+      status: secondPass.passed ? 'QA_PASSED' : 'QA_FAILED',
+    })
+    .eq('id', listing.id)
+    .select()
+    .single();
+
+  return updatedListing || listing;
 }
 
 function generateListingForPlatform(platform: string, product: any, productMaster: any) {

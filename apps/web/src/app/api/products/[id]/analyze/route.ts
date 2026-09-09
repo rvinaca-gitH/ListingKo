@@ -40,7 +40,10 @@ export async function POST(
       name: product.title,
       description: product.description || `${product.title} - Premium quality product`,
       category: product.category || 'General',
-      sku: (product.title.substring(0, 3) + Date.now().toString().slice(-4)).toUpperCase(),
+      sku: (
+        (product.title.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3) || 'SKU') +
+        Date.now().toString().slice(-4)
+      ).toUpperCase(),
       strengths: [
         'High quality materials',
         'Competitive pricing',
