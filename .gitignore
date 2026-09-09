@@ -50,6 +50,7 @@ Thumbs.db
 
 # Database backups
 *.sql
+!supabase/migrations/*.sql
 postgres_data/
 
 # Cache
