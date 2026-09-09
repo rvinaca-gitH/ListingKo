@@ -7,6 +7,9 @@ import { supabase } from '@/lib/supabase';
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
+  const [email, setEmail] = useState('');
+  const [linkSent, setLinkSent] = useState(false);
+  const [signInError, setSignInError] = useState('');
   const router = useRouter();
 
   // Authentication is checked once when the landing page mounts.
@@ -36,19 +39,22 @@ export default function Home() {
     }
   };
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setSigningIn(true);
+    setSignInError('');
     try {
-      const { error } = await supabase.auth.signInAnonymously();
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
       if (error) throw error;
-      router.push('/dashboard');
+      setLinkSent(true);
     } catch (error) {
       console.error('Sign in failed:', error);
-      if (process.env.NEXT_PUBLIC_ENV === 'development') {
-        router.push('/dashboard');
-      } else {
-        alert('Failed to sign in. Try again.');
-      }
+      setSignInError(error instanceof Error ? error.message : 'Failed to send sign-in link. Try again.');
     } finally {
       setSigningIn(false);
     }
@@ -83,13 +89,33 @@ export default function Home() {
             Sign in to create and manage your product listings powered by AI.
           </p>
 
-          <button
-            onClick={handleSignIn}
-            disabled={signingIn}
-            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold transition mb-4"
-          >
-            {signingIn ? 'Signing in...' : 'Get Started'}
-          </button>
+          {linkSent ? (
+            <div className="text-center py-4">
+              <p className="text-green-700 font-medium mb-1">Check your email!</p>
+              <p className="text-sm text-gray-600">We sent a sign-in link to {email}</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSignIn} className="mb-4">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {signInError && (
+                <p className="text-sm text-red-600 mb-3">{signInError}</p>
+              )}
+              <button
+                type="submit"
+                disabled={signingIn}
+                className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold transition"
+              >
+                {signingIn ? 'Sending link...' : 'Get Started'}
+              </button>
+            </form>
+          )}
 
           <div className="space-y-3 mt-8 pt-6 border-t border-gray-200">
             <div className="flex items-start">
