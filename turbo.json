@@ -24,7 +24,7 @@
       "persistent": true
     },
     "build": {
-      "outputs": [".next", "dist"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "inputs": [
         "src/**/*.ts",
         "src/**/*.tsx",
