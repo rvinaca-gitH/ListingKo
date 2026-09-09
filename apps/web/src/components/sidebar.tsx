@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 const MENU_ITEMS = [
   { id: 'home', label: 'Home', icon: '🏠', href: '/dashboard' },
@@ -28,12 +29,10 @@ export default function Sidebar() {
 
   const handleSignOut = async () => {
     try {
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      if (response.ok) {
-        router.push('/');
-      }
+      await supabase.auth.signOut();
     } catch (error) {
       console.error('Sign out failed:', error);
+    } finally {
       router.push('/');
     }
   };
