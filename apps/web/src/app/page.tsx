@@ -7,8 +7,10 @@ import { supabase } from '@/lib/supabase';
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [email, setEmail] = useState('');
-  const [linkSent, setLinkSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
   const [signInError, setSignInError] = useState('');
   const router = useRouter();
 
@@ -39,7 +41,7 @@ export default function Home() {
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setSigningIn(true);
     setSignInError('');
@@ -51,12 +53,32 @@ export default function Home() {
         },
       });
       if (error) throw error;
-      setLinkSent(true);
+      setCodeSent(true);
     } catch (error) {
       console.error('Sign in failed:', error);
-      setSignInError(error instanceof Error ? error.message : 'Failed to send sign-in link. Try again.');
+      setSignInError(error instanceof Error ? error.message : 'Failed to send sign-in code. Try again.');
     } finally {
       setSigningIn(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerifying(true);
+    setSignInError('');
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'email',
+      });
+      if (error) throw error;
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Code verification failed:', error);
+      setSignInError(error instanceof Error ? error.message : 'Invalid or expired code. Try again.');
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -89,13 +111,40 @@ export default function Home() {
             Sign in to create and manage your product listings powered by AI.
           </p>
 
-          {linkSent ? (
-            <div className="text-center py-4">
-              <p className="text-green-700 font-medium mb-1">Check your email!</p>
-              <p className="text-sm text-gray-600">We sent a sign-in link to {email}</p>
-            </div>
+          {codeSent ? (
+            <form onSubmit={handleVerifyCode} className="mb-4">
+              <p className="text-sm text-gray-600 mb-3">
+                We sent a 6-digit code to <span className="font-medium">{email}</span>. Enter it below (or click the link in the email).
+              </p>
+              <input
+                type="text"
+                inputMode="numeric"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="123456"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg tracking-widest"
+              />
+              {signInError && (
+                <p className="text-sm text-red-600 mb-3">{signInError}</p>
+              )}
+              <button
+                type="submit"
+                disabled={verifying}
+                className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold transition"
+              >
+                {verifying ? 'Verifying...' : 'Verify & Sign In'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCodeSent(false); setOtp(''); setSignInError(''); }}
+                className="w-full mt-2 text-sm text-gray-500 hover:text-gray-700"
+              >
+                Use a different email
+              </button>
+            </form>
           ) : (
-            <form onSubmit={handleSignIn} className="mb-4">
+            <form onSubmit={handleSendCode} className="mb-4">
               <input
                 type="email"
                 required
@@ -112,7 +161,7 @@ export default function Home() {
                 disabled={signingIn}
                 className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold transition"
               >
-                {signingIn ? 'Sending link...' : 'Get Started'}
+                {signingIn ? 'Sending code...' : 'Get Started'}
               </button>
             </form>
           )}
