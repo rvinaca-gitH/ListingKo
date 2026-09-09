@@ -77,10 +77,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // NOTE: this is text-to-image only (no free image-to-image/editing model
+    // is available on Hugging Face's hf-inference tier as of writing - see
+    // https://huggingface.co/api/models?pipeline_tag=image-to-image&inference_provider=hf-inference).
+    // These generated images do NOT reference the user's uploaded photo, so
+    // they cannot reliably match the real product's exact appearance. Prompts
+    // below maximize how close free text-to-image can get by packing in every
+    // known product detail, but this is a fundamental limitation of the free
+    // tier, not a prompt-tuning problem alone.
+    const productDetails = [
+      productMaster.description,
+      productMaster.category ? `Category: ${productMaster.category}.` : '',
+      productMaster.target_customer ? `For: ${productMaster.target_customer}.` : '',
+    ].filter(Boolean).join(' ');
+
+    const primaryUseCase = productMaster.use_cases?.[0] || 'everyday use';
+
     const prompts = [
-      `Professional product photo of ${productMaster.name}. Product photography, studio lighting, white background, high quality, professional`,
-      `Lifestyle photo showing ${productMaster.name} in use. Lifestyle photography, realistic setting, modern aesthetic`,
-      `Hero product image for ecommerce: ${productMaster.name}. Marketing photography, professional, clean background, product focused`,
+      `Enhanced professional product photo of ${productMaster.name}. ${productDetails} Same exact product design, shape, color, and materials - no alterations, no reinterpretation. Studio product photography, soft even lighting, clean seamless white background, sharp focus, 8k resolution, ultra high detail, commercial ecommerce photography`,
+      `${productMaster.name} being used in a real-world context: ${primaryUseCase}. ${productDetails} A person naturally using or wearing the product exactly as designed, no changes to the product's appearance. Photorealistic lifestyle photography, natural lighting, authentic candid moment, high resolution, professional commercial photography that drives buyer confidence`,
+      `${productMaster.name} professionally displayed in its ideal retail presentation - product mounted, staged, or arranged on the appropriate display fixture or setting for a ${productMaster.category || 'product'} (e.g. stand, mannequin, shelf, or holder as fits the item). ${productDetails} Same exact product, no design changes. Premium ecommerce hero shot, dramatic soft studio lighting, shallow depth of field, 8k resolution, marketing photography optimized for conversion`,
     ];
 
     const generatedImages = [];
