@@ -84,10 +84,12 @@ export async function POST(request: NextRequest) {
     ];
 
     const generatedImages = [];
+    // Hugging Face retired api-inference.huggingface.co in favor of the
+    // router-based Inference Providers API. Only models explicitly listed
+    // under the free "hf-inference" provider work here - check with:
+    // https://huggingface.co/api/models?pipeline_tag=text-to-image&inference_provider=hf-inference
     const models = [
-      'black-forest-labs/FLUX.1-dev',
-      'stabilityai/stable-diffusion-2-1',
-      'runwayml/stable-diffusion-v1-5',
+      'stabilityai/stable-diffusion-3-medium-diffusers',
     ];
 
     for (let i = 0; i < prompts.length; i++) {
@@ -102,7 +104,7 @@ export async function POST(request: NextRequest) {
           const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
           const response = await fetch(
-            `https://api-inference.huggingface.co/models/${model}`,
+            `https://router.huggingface.co/hf-inference/models/${model}`,
             {
               method: 'POST',
               headers: {
